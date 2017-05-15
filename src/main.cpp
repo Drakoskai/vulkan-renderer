@@ -13,7 +13,8 @@ const int HEIGHT = 600;
 const std::string CHALET_MODEL_PATH = "models/chalet.obj";
 const std::string CHALET_TEXTURE_PATH = "textures/chalet.jpg";
 
-const std::string CUBE_MODEL_PATH = "models/cube/cube.obj";
+const std::string CUBE_MODEL_PATH = "models/cube/";
+const std::string CUBE_MODEL_NAME= "cube.obj";
 
 
 class App {
@@ -34,7 +35,7 @@ public:
 		
 		Mesh* mesh = new Mesh();
 		renderer->InitMesh(mesh);
-		mesh->LoadFromFile(CUBE_MODEL_PATH);
+		mesh->LoadFromFile(CUBE_MODEL_PATH, CUBE_MODEL_NAME);
 		MeshRenderer* cubeRenderer = cube->GetComponent<MeshRenderer>();
 		cubeRenderer->SetMesh(mesh);
 		Transform* cubeTransform = cube->GetComponent<Transform>();

@@ -6,33 +6,15 @@ namespace Vulkan {
 	VulkanPipeline::VulkanPipeline() : pRenderer(nullptr) {}
 
 	VulkanPipeline::VulkanPipeline(VulkanRenderer* renderer) : pRenderer(renderer) {
-		pipelineCache = { pRenderer->device, vkDestroyPipelineCache };
 		pipelineLayout = { pRenderer->device, vkDestroyPipelineLayout };
-		CreatePipelineCache();
 	}
 
-	void VulkanPipeline::SetRenderDevice(VulkanRenderer* renderer) {	
+	void VulkanPipeline::SetRenderDevice(VulkanRenderer* renderer) {
 		pRenderer = renderer;
-		pipelineCache = { pRenderer->device, vkDestroyPipelineCache };
 		pipelineLayout = { pRenderer->device, vkDestroyPipelineLayout };
-		CreatePipelineCache();
-		shaderProgram.SetRenderDevice(pRenderer);
 	}
 
-	void VulkanPipeline::CreatePipelineCache() {
-		VkPipelineCacheCreateInfo pipelineCacheInfo;
-		pipelineCacheInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-		pipelineCacheInfo.initialDataSize = 0;
-		pipelineCacheInfo.flags = 0;
-
-		if (vkCreatePipelineCache(pRenderer->device, &pipelineCacheInfo, nullptr, pipelineCache.replace()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create pipeline cache!");
-		}
-	}
-
-	void VulkanPipeline::CreatePipeline(VkCom<VkPipeline>& pipeline, VulkanDrawable* drawable) {
-		shaderProgram.LoadShaders("shaders/default_vert.spv", "shaders/default_frag.spv");
-
+	void VulkanPipeline::CreatePipeline(VkCom<VkPipeline>& pipeline, VulkanDrawable* drawable, Material* material) {
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
@@ -40,26 +22,28 @@ namespace Vulkan {
 		auto attributeDescriptions = VertexPTC::GetAttributeDescriptions();
 
 		vertexInputInfo.vertexBindingDescriptionCount = 1;
-		vertexInputInfo.vertexAttributeDescriptionCount = attributeDescriptions.size();
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
 		vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
 		vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 		VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
 		inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+		inputAssembly.pNext = nullptr;
+		//inputAssembly.flags = 0;
 		inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-		VkViewport viewport = {};
-		viewport.x = 0.0f;
-		viewport.y = 0.0f;
-		viewport.width = static_cast<float>(pRenderer->swapChainExtent.width);
-		viewport.height = static_cast<float>(pRenderer->swapChainExtent.height);
-		viewport.minDepth = 0.0f;
-		viewport.maxDepth = 1.0f;
+		VkViewport viewport = {
+			0.0f,
+			0.0f,
+			static_cast<float>(pRenderer->swapChainExtent.width),
+			static_cast<float>(pRenderer->swapChainExtent.height),
+			0.0f,
+			1.0f };
 
-		VkRect2D scissor = {};
-		scissor.offset = { 0, 0 };
-		scissor.extent = pRenderer->swapChainExtent;
+		VkRect2D scissor = {
+			{ 0, 0 },
+			pRenderer->swapChainExtent };
 
 		VkPipelineViewportStateCreateInfo viewportState = {};
 		viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -118,8 +102,8 @@ namespace Vulkan {
 
 		VkGraphicsPipelineCreateInfo pipelineInfo = {};
 		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-		pipelineInfo.stageCount = 2;
-		pipelineInfo.pStages = shaderProgram.shaderStages;
+		pipelineInfo.stageCount = 2;		
+		pipelineInfo.pStages = pRenderer->GetShader(material->shader)->shaderStages;
 		pipelineInfo.pVertexInputState = &vertexInputInfo;
 		pipelineInfo.pInputAssemblyState = &inputAssembly;
 		pipelineInfo.pViewportState = &viewportState;
@@ -132,7 +116,7 @@ namespace Vulkan {
 		pipelineInfo.subpass = 0;
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-		if (vkCreateGraphicsPipelines(pRenderer->device, pipelineCache, 1, &pipelineInfo, nullptr, pipeline.replace()) != VK_SUCCESS) {
+		if (vkCreateGraphicsPipelines(pRenderer->device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, pipeline.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create graphics pipeline!");
 		}
 	}

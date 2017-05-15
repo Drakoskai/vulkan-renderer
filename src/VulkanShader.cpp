@@ -5,17 +5,18 @@
 
 namespace Vulkan
 {
+
 	VulkanShader::VulkanShader() : pRenderer(nullptr) {}
 
 	VulkanShader::VulkanShader(VulkanRenderer* pRenderer) : pRenderer(pRenderer) {}
 
-	void VulkanShader::LoadShaders(std::string vertexShaderFile, std::string fragmentShaderFile) {
+	void VulkanShader::LoadShaders(ShaderId shaderId) {
 		if (!pRenderer) {
 			throw std::runtime_error("Vulkan Shader not intialized!");
 		}
 
-		auto vertShaderCode = ReadFile(vertexShaderFile);
-		auto fragShaderCode = ReadFile(fragmentShaderFile);
+		auto vertShaderCode = ReadFile(shaderId.GetVertexShader());
+		auto fragShaderCode = ReadFile(shaderId.GetFragmentShader());
 
 		vertShaderModule = { pRenderer->device, vkDestroyShaderModule };
 		fragShaderModule = { pRenderer->device, vkDestroyShaderModule };

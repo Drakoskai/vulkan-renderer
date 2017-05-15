@@ -9,7 +9,7 @@ void SubMesh::Generate() {
 	if (!pRenderer) { return; }
 	SolveAABB();
 	buffer = pRenderer->GetDrawable();
-	buffer->Generate(verticesPTC, indices);
+	buffer->Generate(verticesPTC, indices, &material);
 }
 
 void SubMesh::SolveAABB() {

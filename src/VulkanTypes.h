@@ -3,7 +3,6 @@
 #include "KaiMath.h"
 #include <vulkan/vulkan.h>
 #include "GraphicsEnums.h"
-#include "VkCom.h"
 
 namespace Vulkan {
 	const std::vector<const char*> validationLayers = {

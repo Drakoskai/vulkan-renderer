@@ -5,6 +5,7 @@
 #include "VkCom.h"
 #include "Vertex.h"
 #include "VulkanPipeline.h"
+#include "VulkanShader.h"
 
 namespace Vulkan {
 	class VulkanRenderer;
@@ -15,14 +16,14 @@ namespace Vulkan {
 		VulkanDrawable(VulkanRenderer* renderer);
 		~VulkanDrawable();
 		void SetRenderDevice(VulkanRenderer* renderer);
-		void Generate(const std::vector<VertexPTC>& vertices, const std::vector<uint32_t>& indices);
+		void Generate(const std::vector<VertexPTC>& vertices, const std::vector<uint32_t>& indices, Material* material);
 		void RecordDrawCommand(const VkCommandBuffer& commandBuffer) const;
 		void CreateVertexBuffer(const std::vector<VertexPTC>& vertices);
 		void CreateIndexBuffer(const std::vector<uint32_t>& indices);
 		void CreateDescriptorSetLayout();
 		void CreateUniformBuffer();
 		void CreateDescriptorPool();
-		void CreateDescriptorSet();
+		void CreateDescriptorSet(Material* material);
 
 		VkCom<VkBuffer> vertexBuffer;
 		VkCom<VkDeviceMemory> vertexBufferMemory;
@@ -30,14 +31,14 @@ namespace Vulkan {
 		VkCom<VkDeviceMemory> indexBufferMemory;
 		VkCom<VkBuffer> uniformStagingBuffer;
 		VkCom<VkDeviceMemory> uniformStagingBufferMemory;
+
 		VkCom<VkBuffer> uniformBuffer;
 		VkCom<VkDeviceMemory> uniformBufferMemory;
 
 		VkCom<VkDescriptorPool> descriptorPool;		
 		VkCom<VkDescriptorSetLayout> descriptorSetLayout;
-		VkDescriptorSet descriptorSet = nullptr;
+		VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
 		VkCom<VkPipeline> pPipeline;
-
 		VulkanRenderer* pRenderer;
 		
 	private:

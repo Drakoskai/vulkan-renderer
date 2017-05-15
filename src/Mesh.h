@@ -10,7 +10,7 @@ public:
 	Mesh(Vulkan::VulkanRenderer* renderer);
 	~Mesh();
 	void SetRenderDevice(Vulkan::VulkanRenderer* renderer) { pRenderer = renderer; }
-	void LoadFromFile(const std::string& filepath);
+	void LoadFromFile(const std::string& path, const std::string& filename);
 	const Vec3& GetAABBMin() const;
 	const Vec3& GetAABBMax() const;
 	const Vec3& GetSubMeshAABBMin(uint32_t subMeshIndex) const;

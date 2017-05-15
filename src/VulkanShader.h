@@ -1,13 +1,12 @@
 #pragma once
 #include <vulkan/vulkan.h>
-#include <string>
 #include "VkCom.h"
+#include "GraphicsStructs.h"
 
 namespace Vulkan
 {
 	class VulkanRenderer;
-
-	struct VulkanShader {		
+	struct VulkanShader {
 		VulkanRenderer* pRenderer;
 		VkCom<VkShaderModule> vertShaderModule;
 		VkCom<VkShaderModule> fragShaderModule;
@@ -16,7 +15,8 @@ namespace Vulkan
 		VulkanShader();
 		explicit VulkanShader(VulkanRenderer* pRenderer);
 		void SetRenderDevice(VulkanRenderer* renderer) { pRenderer = renderer; }
-		void LoadShaders(std::string vertexShaderFile, std::string fragmentShaderFile);
+		void LoadShaders(ShaderId shaderId);
+
 	};
 
 }

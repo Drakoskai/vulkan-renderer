@@ -12,8 +12,8 @@ Mesh::Mesh(Vulkan::VulkanRenderer* renderer) : mNextSubMesh(0), pRenderer(render
 
 Mesh::~Mesh() {}
 
-void Mesh::LoadFromFile(const std::string& filepath) {
-	FileFormats::LoadObjFile(filepath, *this);
+void Mesh::LoadFromFile(const std::string& path, const std::string& filename) {
+	FileFormats::LoadObjFile(path + filename, path, *this);
 }
 
 const Vec3& Mesh::GetAABBMin() const { return m_aabbMin; }

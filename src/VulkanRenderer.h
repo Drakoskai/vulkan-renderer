@@ -3,7 +3,7 @@
 #ifndef GLFW_INCLUDE_VULKAN
 #define GLFW_INCLUDE_VULKAN
 #endif
-
+#include <unordered_map>
 #include <GLFW/glfw3.h>
 #include "GraphicsStructs.h"
 #include "VkCom.h"
@@ -79,7 +79,8 @@ namespace Vulkan {
 		void PrepareFrame() override;
 		void DrawFrame() override;
 		void EndFrame() override;
-
+		VulkanShader* GetShader(ShaderId shaderid);
+		VulkanTexture* GetTexture(TextureId textureid);
 		VkCommandBuffer BeginCommandBuffer() const;
 		void EndCommandBuffer(VkCommandBuffer commandBuffer) const;
 
@@ -112,9 +113,6 @@ namespace Vulkan {
 		VkFormat FindSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) const;
 		VkFormat FindDepthFormat() const;
 		static bool HasStencilComponent(VkFormat format);
-		//void CreateTextureImage();
-		//void CreateTextureImageView();
-		//void CreateTextureSampler();
 		void CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, VkCom<VkImageView>& imageView) const;
 		void CreateImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkCom<VkImage>& image, VkCom<VkDeviceMemory>& imageMemory) const;
 		void TransitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) const;
@@ -140,7 +138,7 @@ namespace Vulkan {
 		VkCom<VkDebugReportCallbackEXT> callback{ instance, DestroyDebugReportCallbackEXT };
 		VkCom<VkSurfaceKHR> surface{ instance, vkDestroySurfaceKHR };
 
-		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+		VkPhysicalDevice physicalDevice = nullptr;
 		VkCom<VkDevice> device{ vkDestroyDevice };
 
 		VkQueue graphicsQueue;
@@ -158,15 +156,15 @@ namespace Vulkan {
 		VkCom<VkRenderPass> renderPass{ device, vkDestroyRenderPass };;
 
 		VulkanPipeline pipeline;
+
+		std::unordered_map<ShaderId, VulkanShader> shadercache;
+		std::unordered_map<TextureId, VulkanTexture> texturecache;
 		
+
 		VkCom<VkImage> depthImage{ device, vkDestroyImage };
 		VkCom<VkDeviceMemory> depthImageMemory{ device, vkFreeMemory };
 		VkCom<VkImageView> depthImageView{ device, vkDestroyImageView };
-		VulkanTexture texture;
-		/*VkCom<VkImage> textureImage{ device, vkDestroyImage };
-		VkCom<VkDeviceMemory> textureImageMemory{ device, vkFreeMemory };
-		VkCom<VkImageView> textureImageView{ device, vkDestroyImageView };
-		VkCom<VkSampler> textureSampler{ device, vkDestroySampler };*/
+
 
 		std::vector<VkCommandBuffer> commandBuffers;
 

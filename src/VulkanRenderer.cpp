@@ -24,10 +24,6 @@ namespace Vulkan {
 		CreateFramebuffers();
 
 		pipeline.SetRenderDevice(this);
-		texture.SetRenderDevice(this);
-
-		texture.file = CUBE_TEXTURE_PATH;
-		texture.Generate();
 
 		CreateCommandBuffers();
 		CreateSemaphores();
@@ -103,13 +99,34 @@ namespace Vulkan {
 
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
 			RecreateSwapChain();
-		}
-		else if (result != VK_SUCCESS) {
+		} else if (result != VK_SUCCESS) {
 			throw std::runtime_error("failed to present swap chain image!");
 		}
 	}
 
 	void VulkanRenderer::EndFrame() {}
+
+	VulkanShader* VulkanRenderer::GetShader(ShaderId shaderid) {
+		if (shadercache.find(shaderid) == end(shadercache)) {
+			VulkanShader s;
+			shadercache[shaderid] = s;
+			shadercache[shaderid].SetRenderDevice(this);
+			shadercache[shaderid].LoadShaders(shaderid);
+		} 
+
+		return  &shadercache[shaderid];
+	}
+
+	VulkanTexture* VulkanRenderer::GetTexture(TextureId textureid) {
+		if (texturecache.find(textureid) == end(texturecache)) {
+			VulkanTexture t;
+			texturecache[textureid] = t;
+			texturecache[textureid].file = textureid.GetTextureName();
+			texturecache[textureid].SetRenderDevice(this);
+			texturecache[textureid].Generate();
+		}
+		return &texturecache[textureid];
+	}
 
 	VkCommandBuffer VulkanRenderer::BeginCommandBuffer() const {
 		VkCommandBufferAllocateInfo allocInfo = {};
@@ -173,14 +190,13 @@ namespace Vulkan {
 		createInfo.pApplicationInfo = &appInfo;
 
 		auto extensions = GetRequiredExtensions();
-		createInfo.enabledExtensionCount = extensions.size();
+		createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 		createInfo.ppEnabledExtensionNames = extensions.data();
 
 		if (enableValidationLayers) {
-			createInfo.enabledLayerCount = validationLayers.size();
+			createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
 			createInfo.ppEnabledLayerNames = validationLayers.data();
-		}
-		else {
+		} else {
 			createInfo.enabledLayerCount = 0;
 		}
 
@@ -257,14 +273,13 @@ namespace Vulkan {
 
 		createInfo.pEnabledFeatures = &deviceFeatures;
 
-		createInfo.enabledExtensionCount = deviceExtensions.size();
+		createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 		createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
 		if (enableValidationLayers) {
-			createInfo.enabledLayerCount = validationLayers.size();
+			createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
 			createInfo.ppEnabledLayerNames = validationLayers.data();
-		}
-		else {
+		} else {
 			createInfo.enabledLayerCount = 0;
 		}
 
@@ -300,14 +315,13 @@ namespace Vulkan {
 		createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
 		QueueFamilyIndices indices = FindQueueFamilies(physicalDevice);
-		uint32_t queueFamilyIndices[] = { (uint32_t)indices.graphicsFamily, (uint32_t)indices.presentFamily };
+		uint32_t queueFamilyIndices[] = { static_cast<uint32_t>(indices.graphicsFamily), static_cast<uint32_t>(indices.presentFamily) };
 
 		if (indices.graphicsFamily != indices.presentFamily) {
 			createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
 			createInfo.queueFamilyIndexCount = 2;
 			createInfo.pQueueFamilyIndices = queueFamilyIndices;
-		}
-		else {
+		} else {
 			createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
 		}
 
@@ -363,11 +377,11 @@ namespace Vulkan {
 		depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-		VkAttachmentReference colorAttachmentRef = {};
+		VkAttachmentReference colorAttachmentRef;
 		colorAttachmentRef.attachment = 0;
 		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-		VkAttachmentReference depthAttachmentRef = {};
+		VkAttachmentReference depthAttachmentRef;
 		depthAttachmentRef.attachment = 1;
 		depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
@@ -388,7 +402,7 @@ namespace Vulkan {
 		std::array<VkAttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
 		VkRenderPassCreateInfo renderPassInfo = {};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassInfo.attachmentCount = attachments.size();
+		renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
 		renderPassInfo.pAttachments = attachments.data();
 		renderPassInfo.subpassCount = 1;
 		renderPassInfo.pSubpasses = &subpass;
@@ -433,7 +447,7 @@ namespace Vulkan {
 			VkFramebufferCreateInfo framebufferInfo = {};
 			framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 			framebufferInfo.renderPass = renderPass;
-			framebufferInfo.attachmentCount = attachments.size();
+			framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
 			framebufferInfo.pAttachments = attachments.data();
 			framebufferInfo.width = swapChainExtent.width;
 			framebufferInfo.height = swapChainExtent.height;
@@ -447,7 +461,7 @@ namespace Vulkan {
 
 	void VulkanRenderer::CreateCommandBuffers() {
 		if (commandBuffers.size() > 0) {
-			vkFreeCommandBuffers(device, commandPool, commandBuffers.size(), commandBuffers.data());
+			vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 		}
 
 		commandBuffers.resize(swapChainFramebuffers.size());
@@ -480,7 +494,7 @@ namespace Vulkan {
 			clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
 			clearValues[1].depthStencil = { 1.0f, 0 };
 
-			renderPassInfo.clearValueCount = clearValues.size();
+			renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
 			renderPassInfo.pClearValues = clearValues.data();
 
 			vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
@@ -605,8 +619,7 @@ namespace Vulkan {
 			if (HasStencilComponent(format)) {
 				barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
 			}
-		}
-		else {
+		} else {
 			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		}
 
@@ -618,20 +631,16 @@ namespace Vulkan {
 		if (oldLayout == VK_IMAGE_LAYOUT_PREINITIALIZED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) {
 			barrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
 			barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-		}
-		else if (oldLayout == VK_IMAGE_LAYOUT_PREINITIALIZED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+		} else if (oldLayout == VK_IMAGE_LAYOUT_PREINITIALIZED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
 			barrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT;
 			barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-		}
-		else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+		} else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
 			barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
 			barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-		}
-		else if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+		} else if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
 			barrier.srcAccessMask = 0;
 			barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		}
-		else {
+		} else {
 			throw std::invalid_argument("unsupported layout transition!");
 		}
 
@@ -650,13 +659,13 @@ namespace Vulkan {
 	void VulkanRenderer::CopyImage(VkImage srcImage, VkImage dstImage, uint32_t width, uint32_t height) const {
 		VkCommandBuffer commandBuffer = BeginCommandBuffer();
 
-		VkImageSubresourceLayers subResource = {};
+		VkImageSubresourceLayers subResource;
 		subResource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		subResource.baseArrayLayer = 0;
 		subResource.mipLevel = 0;
 		subResource.layerCount = 1;
 
-		VkImageCopy region = {};
+		VkImageCopy region;
 		region.srcSubresource = subResource;
 		region.dstSubresource = subResource;
 		region.srcOffset = { 0, 0, 0 };
@@ -759,8 +768,7 @@ namespace Vulkan {
 		for (const auto& availablePresentMode : availablePresentModes) {
 			if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
 				return availablePresentMode;
-			}
-			else if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
+			} else if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
 				bestMode = availablePresentMode;
 			}
 		}
@@ -771,12 +779,11 @@ namespace Vulkan {
 	VkExtent2D VulkanRenderer::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const {
 		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
 			return capabilities.currentExtent;
-		}
-		else {
+		} else {
 			int width, height;
 			glfwGetWindowSize(pWnd, &width, &height);
 
-			VkExtent2D actualExtent = { width, height };
+			VkExtent2D actualExtent = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 
 			actualExtent.width = std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, actualExtent.width));
 			actualExtent.height = std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, actualExtent.height));
@@ -875,8 +882,7 @@ namespace Vulkan {
 		std::vector<const char*> extensions;
 
 		unsigned int glfwExtensionCount = 0;
-		const char** glfwExtensions;
-		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+		const char ** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
 		for (unsigned int i = 0; i < glfwExtensionCount; i++) {
 			extensions.push_back(glfwExtensions[i]);

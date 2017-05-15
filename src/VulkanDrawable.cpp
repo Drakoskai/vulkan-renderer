@@ -36,7 +36,7 @@ namespace Vulkan {
 		descriptorSetLayout = { pRenderer->device, vkDestroyDescriptorSetLayout };
 	}
 
-	void VulkanDrawable::Generate(const std::vector<VertexPTC>& vertices, const std::vector<uint32_t>& indices) {
+	void VulkanDrawable::Generate(const std::vector<VertexPTC>& vertices, const std::vector<uint32_t>& indices, Material* material) {
 		if (!pRenderer) {
 			throw std::runtime_error("Vulkan Drawable not intialized!");
 		}
@@ -45,10 +45,10 @@ namespace Vulkan {
 		CreateVertexBuffer(vertices);
 		CreateIndexBuffer(indices);
 		CreateDescriptorSetLayout();
-		pRenderer->pipeline.CreatePipeline(pPipeline, this);
+		pRenderer->pipeline.CreatePipeline(pPipeline, this, material);
 		CreateUniformBuffer();
 		CreateDescriptorPool();
-		CreateDescriptorSet();
+		CreateDescriptorSet(material);
 	}
 
 	void VulkanDrawable::RecordDrawCommand(const VkCommandBuffer& commandBuffer) const {
@@ -103,14 +103,14 @@ namespace Vulkan {
 	}
 
 	void VulkanDrawable::CreateDescriptorSetLayout() {
-		VkDescriptorSetLayoutBinding uboLayoutBinding = {};
+		VkDescriptorSetLayoutBinding uboLayoutBinding;
 		uboLayoutBinding.binding = 0;
 		uboLayoutBinding.descriptorCount = 1;
 		uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		uboLayoutBinding.pImmutableSamplers = nullptr;
 		uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-		VkDescriptorSetLayoutBinding samplerLayoutBinding = {};
+		VkDescriptorSetLayoutBinding samplerLayoutBinding;
 		samplerLayoutBinding.binding = 1;
 		samplerLayoutBinding.descriptorCount = 1;
 		samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -120,7 +120,7 @@ namespace Vulkan {
 		std::array<VkDescriptorSetLayoutBinding, 2> bindings = { uboLayoutBinding, samplerLayoutBinding };
 		VkDescriptorSetLayoutCreateInfo layoutInfo = {};
 		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		layoutInfo.bindingCount = bindings.size();
+		layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
 		layoutInfo.pBindings = bindings.data();
 
 		if (vkCreateDescriptorSetLayout(pRenderer->device, &layoutInfo, nullptr, descriptorSetLayout.replace()) != VK_SUCCESS) {
@@ -144,7 +144,7 @@ namespace Vulkan {
 
 		VkDescriptorPoolCreateInfo poolInfo = {};
 		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-		poolInfo.poolSizeCount = poolSizes.size();
+		poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
 		poolInfo.pPoolSizes = poolSizes.data();
 		poolInfo.maxSets = 1;
 
@@ -153,7 +153,7 @@ namespace Vulkan {
 		}
 	}
 
-	void VulkanDrawable::CreateDescriptorSet() {
+	void VulkanDrawable::CreateDescriptorSet(Material* material) {
 		VkDescriptorSetLayout layouts[] = { descriptorSetLayout };
 		VkDescriptorSetAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -165,15 +165,10 @@ namespace Vulkan {
 			throw std::runtime_error("failed to allocate descriptor set!");
 		}
 
-		VkDescriptorBufferInfo bufferInfo = {};
+		VkDescriptorBufferInfo bufferInfo;
 		bufferInfo.buffer = uniformBuffer;
 		bufferInfo.offset = 0;
 		bufferInfo.range = sizeof(UniformBufferObject);
-
-		VkDescriptorImageInfo imageInfo = {};
-		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = pRenderer->texture.textureImageView;
-		imageInfo.sampler = pRenderer->texture.textureSampler;
 
 		std::array<VkWriteDescriptorSet, 2> descriptorWrites = {};
 
@@ -185,14 +180,17 @@ namespace Vulkan {
 		descriptorWrites[0].descriptorCount = 1;
 		descriptorWrites[0].pBufferInfo = &bufferInfo;
 
-		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		descriptorWrites[1].dstSet = descriptorSet;
-		descriptorWrites[1].dstBinding = 1;
-		descriptorWrites[1].dstArrayElement = 0;
-		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		descriptorWrites[1].descriptorCount = 1;
-		descriptorWrites[1].pImageInfo = &imageInfo;
+		VulkanTexture* diffuseTexture = pRenderer->GetTexture(material->diffuseTexture);
+		if (diffuseTexture) {
+			descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[1].dstSet = descriptorSet;
+			descriptorWrites[1].dstBinding = 1;
+			descriptorWrites[1].dstArrayElement = 0;
+			descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			descriptorWrites[1].descriptorCount = 1;
+			descriptorWrites[1].pImageInfo = &diffuseTexture->imageInfo;
+		}
 
-		vkUpdateDescriptorSets(pRenderer->device, descriptorWrites.size(), descriptorWrites.data(), 0, nullptr);
+		vkUpdateDescriptorSets(pRenderer->device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}
 }

@@ -1,4 +1,4 @@
-newmtl cube
+newmtl Material
   Ns 10.0000
   Ni 1.5000
   Tr 0  0

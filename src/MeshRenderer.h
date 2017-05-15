@@ -5,7 +5,7 @@
 
 
 class Mesh;
-class Material;
+struct Material;
 namespace Vulkan {
 	class VulcanRenderer;
 }

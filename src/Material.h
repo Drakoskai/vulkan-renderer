@@ -2,6 +2,7 @@
 
 #include "Vertex.h"
 #include <string>
+#include "GraphicsStructs.h"
 
 struct Material {
 	std::string name;
@@ -11,6 +12,6 @@ struct Material {
 	Vec3 specular;
 	uint32_t shininess;
 	float alpha;
-	std::string diffuseTexture;
-	std::string bumpMapTexture;
+	TextureId diffuseTexture;
+	ShaderId shader;
 };

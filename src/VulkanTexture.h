@@ -2,8 +2,7 @@
 #include <vulkan/vulkan.h>
 #include "VkCom.h"
 
-namespace Vulkan
-{
+namespace Vulkan {
 	class VulkanRenderer;
 	struct VulkanTexture {
 		std::string file;
@@ -21,7 +20,7 @@ namespace Vulkan
 		VulkanRenderer* pRenderer;
 
 		VulkanTexture();
-		VulkanTexture(VulkanRenderer* renderer);
+		explicit VulkanTexture(VulkanRenderer* renderer);
 		void SetRenderDevice(VulkanRenderer* renderer);
 		void Generate();
 		void CreateTextureImage();
