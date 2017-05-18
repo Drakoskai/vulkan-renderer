@@ -18,8 +18,8 @@ namespace Vulkan {
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-		auto bindingDescription = VertexPTC::GetBindingDescription();
-		auto attributeDescriptions = VertexPTC::GetAttributeDescriptions();
+		auto bindingDescription = VertexPTN::GetBindingDescription();
+		auto attributeDescriptions = VertexPTN::GetAttributeDescriptions();
 
 		vertexInputInfo.vertexBindingDescriptionCount = 1;
 		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());

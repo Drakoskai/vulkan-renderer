@@ -9,7 +9,7 @@ void SubMesh::Generate() {
 	if (!pRenderer) { return; }
 	SolveAABB();
 	buffer = pRenderer->GetDrawable();
-	buffer->Generate(verticesPTC, indices, &material);
+	buffer->Generate(vertices, indices, &material);
 }
 
 void SubMesh::SolveAABB() {
@@ -19,8 +19,8 @@ void SubMesh::SolveAABB() {
 	aabbMin = Vec3(MaxFloatValue, MaxFloatValue, MaxFloatValue);
 	aabbMax = Vec3(-MaxFloatValue, -MaxFloatValue, -MaxFloatValue);
 
-	for (size_t v = 0; v < verticesPTC.size(); ++v) {
-		const Vec3& pos = verticesPTC[v].position;
+	for (size_t v = 0; v < vertices.size(); ++v) {
+		const Vec3& pos = vertices[v].position;
 		aabbMin = Min(aabbMin, pos);
 		aabbMax = Max(aabbMax, pos);
 	}

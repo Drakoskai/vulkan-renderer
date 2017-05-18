@@ -7,9 +7,7 @@
 
 struct SubMesh {
 	std::string name;
-	std::vector<VertexPTC> verticesPTC;
-	/*std::vector<VertexPTN> verticesPTN;
-	std::vector<VertexPTNTC> verticesPTNTC;*/
+	std::vector<VertexPTN> vertices;
 	Vulkan::VulkanRenderer* pRenderer;
 	std::vector<uint32_t> indices;
 	Vec3 aabbMin;

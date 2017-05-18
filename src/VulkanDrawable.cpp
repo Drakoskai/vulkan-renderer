@@ -36,7 +36,7 @@ namespace Vulkan {
 		descriptorSetLayout = { pRenderer->device, vkDestroyDescriptorSetLayout };
 	}
 
-	void VulkanDrawable::Generate(const std::vector<VertexPTC>& vertices, const std::vector<uint32_t>& indices, Material* material) {
+	void VulkanDrawable::Generate(const std::vector<VertexPTN>& vertices, const std::vector<uint32_t>& indices, Material* material) {
 		if (!pRenderer) {
 			throw std::runtime_error("Vulkan Drawable not intialized!");
 		}
@@ -68,7 +68,7 @@ namespace Vulkan {
 		vkCmdDrawIndexed(commandBuffer, mNumIndices, 1, 0, 0, 0);
 	}
 
-	void VulkanDrawable::CreateVertexBuffer(const std::vector<VertexPTC>& vertices) {
+	void VulkanDrawable::CreateVertexBuffer(const std::vector<VertexPTN>& vertices) {
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
 		VkCom<VkBuffer> stagingBuffer{ pRenderer->device, vkDestroyBuffer };

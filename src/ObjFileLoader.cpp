@@ -2,7 +2,6 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 #include <unordered_map>
-#include "Util.h"
 #include "Material.h"
 
 namespace FileFormats {
@@ -18,14 +17,14 @@ namespace FileFormats {
 		}
 		for (const auto& shape : shapes) {
 			SubMesh* subMesh = mesh.AddSubMesh();
-			std::vector<VertexPTC> vertices;
+			std::vector<VertexPTN> vertices;
 			std::vector<uint32_t> indices;
 
-			std::unordered_map<VertexPTC, int32_t> uniqueVertices = { };
+			std::unordered_map<VertexPTN, int32_t> uniqueVertices = { };
 			subMesh->name = shape.name;
 
-			for (const auto& index : shape.mesh.indices) {		
-				VertexPTC vertex = { };
+			for (const auto& index : shape.mesh.indices) {
+				VertexPTN vertex = { };
 				vertex.position = {
 					attrib.vertices[3 * index.vertex_index + 0],
 					attrib.vertices[3 * index.vertex_index + 1],
@@ -36,7 +35,12 @@ namespace FileFormats {
 					attrib.texcoords[2 * index.texcoord_index + 0],
 					1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
 				};
-				vertex.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+				vertex.normal = {
+					attrib.normals[3 * index.normal_index + 0],
+					attrib.normals[3 * index.normal_index + 1],
+					attrib.normals[3 * index.normal_index + 2]
+				};
 
 				if (uniqueVertices.count(vertex) == 0) {
 					uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
@@ -44,11 +48,7 @@ namespace FileFormats {
 				}
 
 				indices.push_back(uniqueVertices[vertex]);
-				
 			}
-			
-			subMesh->verticesPTC = vertices;
-			subMesh->indices = indices;
 			auto& mat = materials[shape.mesh.material_ids[0]];
 			Material material = {};
 			material.name = mat.name;
@@ -57,6 +57,9 @@ namespace FileFormats {
 			material.emissive = Vec3(mat.emission[0], mat.emission[1], mat.emission[2]);
 			material.specular = Vec3(mat.specular[0], mat.specular[1], mat.specular[2]);
 			material.diffuseTexture = materialbase + mat.diffuse_texname;
+
+			subMesh->vertices = vertices;
+			subMesh->indices = indices;
 			subMesh->material = material;
 		}
 	}

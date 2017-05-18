@@ -30,6 +30,7 @@ namespace Vulkan {
 
 	struct UniformBufferObject {
 		Matrix mvp;
+		Matrix world;
 	};
 
 	struct VkTextureFilter {

@@ -35,14 +35,15 @@ namespace Vulkan {
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
 
-		UniformBufferObject ubo = {};
-		Matrix model = rotate(glm::mat4(), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		Matrix view = lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		UniformBufferObject ubo;
+		Matrix model = rotate(glm::mat4(), time * glm::radians(90.0f), Vec3(0.0f, 0.0f, 1.0f));
+		Matrix view = lookAt(Vec3(2.0f, 2.0f, 2.0f), Vec3(0.0f, 0.0f, 0.0f),Vec3(0.0f, 0.0f, 1.0f));
 		Matrix proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / static_cast<float>(swapChainExtent.height), 0.1f, 10.0f);
 		proj[1][1] *= -1;
 
 		void* data;
 		ubo.mvp = proj * view * model;
+		ubo.world = Matrix();
 		vkMapMemory(device, drawbleCache[0].uniformStagingBufferMemory, 0, sizeof(ubo), 0, &data);
 		memcpy(data, &ubo, sizeof(ubo));
 		vkUnmapMemory(device, drawbleCache[0].uniformStagingBufferMemory);
