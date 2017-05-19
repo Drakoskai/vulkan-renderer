@@ -3,28 +3,28 @@
 #include "Camera.h"
 #include "MeshRenderer.h"
 
-Scene::Scene(IRenderer* renderer) : nextFreeGameObject(0), pRenderer(renderer) { pRenderer->Init(); }
+Scene::Scene(IRenderer* renderer) : nextFreeGameObject_(0), pRenderer_(renderer) { pRenderer_->Init(); }
 
 Scene::~Scene() { }
 
 void Scene::Add(GameObject* gameObj) {
-	for(const auto& go : gameObjects) {
+	for(const auto& go : gameObjects_) {
 		if(go == gameObj) {
 			return;
 		}
 	}
 
-	if(nextFreeGameObject >= gameObjects.size()) {
-		gameObjects.resize(gameObjects.size() + 10);
+	if(nextFreeGameObject_ >= gameObjects_.size()) {
+		gameObjects_.resize(gameObjects_.size() + 10);
 	}
 
-	gameObjects[nextFreeGameObject++] = gameObj;
+	gameObjects_[nextFreeGameObject_++] = gameObj;
 }
 
 void Scene::Remove(GameObject* gameObj) {
-	for(size_t i = 0; i < gameObjects.size(); ++i) {
-		if(gameObj == gameObjects[i]) {
-			gameObjects.erase(begin(gameObjects) + i);
+	for(size_t i = 0; i < gameObjects_.size(); ++i) {
+		if(gameObj == gameObjects_[i]) {
+			gameObjects_.erase(begin(gameObjects_) + i);
 			return;
 		}
 	}
@@ -35,7 +35,7 @@ void Scene::Frame() {
 
 	std::vector<GameObject*> cameras;
 	std::vector<GameObject*> renderables;
-	for(auto gameObject : gameObjects) {
+	for(auto gameObject : gameObjects_) {
 		if(!gameObject || !gameObject->IsEnabled()) {
 			continue;
 		}

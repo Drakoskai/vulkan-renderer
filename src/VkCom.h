@@ -1,4 +1,5 @@
-#pragma once
+#ifndef VKCOM_H_
+#define VKCOM_H_
 #include <vulkan/vulkan.h>
 #include <functional>
 
@@ -96,3 +97,4 @@ namespace Vulkan {
 		object = VK_NULL_HANDLE;
 	}
 }
+#endif

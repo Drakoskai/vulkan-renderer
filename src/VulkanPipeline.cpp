@@ -6,12 +6,12 @@ namespace Vulkan {
 	VulkanPipeline::VulkanPipeline() : pRenderer(nullptr) {}
 
 	VulkanPipeline::VulkanPipeline(VulkanRenderer* renderer) : pRenderer(renderer) {
-		pipelineLayout = { pRenderer->device, vkDestroyPipelineLayout };
+		pipelineLayout = { pRenderer->device_, vkDestroyPipelineLayout };
 	}
 
 	void VulkanPipeline::SetRenderDevice(VulkanRenderer* renderer) {
 		pRenderer = renderer;
-		pipelineLayout = { pRenderer->device, vkDestroyPipelineLayout };
+		pipelineLayout = { pRenderer->device_, vkDestroyPipelineLayout };
 	}
 
 	void VulkanPipeline::CreatePipeline(VkCom<VkPipeline>& pipeline, const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions, const std::vector<VkVertexInputBindingDescription>& bindingDescriptions, const std::vector<VkDescriptorSetLayout>& layouts, const ShaderId shaderid) {
@@ -32,14 +32,14 @@ namespace Vulkan {
 		VkViewport viewport = {
 			0.0f,
 			0.0f,
-			static_cast<float>(pRenderer->swapChainExtent.width),
-			static_cast<float>(pRenderer->swapChainExtent.height),
+			static_cast<float>(pRenderer->swapChainExtent_.width),
+			static_cast<float>(pRenderer->swapChainExtent_.height),
 			0.0f,
 			1.0f };
 
 		VkRect2D scissor = {
 			{ 0, 0 },
-			pRenderer->swapChainExtent };
+			pRenderer->swapChainExtent_ };
 
 		VkPipelineViewportStateCreateInfo viewportState = {};
 		viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -91,7 +91,7 @@ namespace Vulkan {
 		pipelineLayoutInfo.setLayoutCount =static_cast<uint32_t>(layouts.size());
 		pipelineLayoutInfo.pSetLayouts = layouts.data();
 
-		if (vkCreatePipelineLayout(pRenderer->device, &pipelineLayoutInfo, nullptr, pipelineLayout.replace()) != VK_SUCCESS) {
+		if (vkCreatePipelineLayout(pRenderer->device_, &pipelineLayoutInfo, nullptr, pipelineLayout.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create pipeline layout!");
 		}
 
@@ -107,11 +107,11 @@ namespace Vulkan {
 		pipelineInfo.pDepthStencilState = &depthStencil;
 		pipelineInfo.pColorBlendState = &colorBlending;
 		pipelineInfo.layout = pipelineLayout;
-		pipelineInfo.renderPass = pRenderer->renderPass;
+		pipelineInfo.renderPass = pRenderer->renderPass_;
 		pipelineInfo.subpass = 0;
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-		if (vkCreateGraphicsPipelines(pRenderer->device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, pipeline.replace()) != VK_SUCCESS) {
+		if (vkCreateGraphicsPipelines(pRenderer->device_, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, pipeline.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create graphics pipeline!");
 		}
 	}

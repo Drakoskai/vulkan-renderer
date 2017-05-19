@@ -1,8 +1,10 @@
-#pragma once
+#ifndef VULKAN_RENDERER_H_
+#define VULKAN_RENDERER_H_
 
 #ifndef GLFW_INCLUDE_VULKAN
 #define GLFW_INCLUDE_VULKAN
 #endif
+
 #include <unordered_map>
 #include <GLFW/glfw3.h>
 #include "GraphicsStructs.h"
@@ -97,11 +99,11 @@ namespace Vulkan {
 		void CreateDepthResources();
 		void CreateFramebuffers();
 		VulkanDrawable* GetDrawable() {
-			if (drawbleCache.size() == currentDrawable) {
-				drawbleCache.resize(currentDrawable + 1);
+			if (drawbles_.size() == currentDrawable_) {
+				drawbles_.resize(currentDrawable_ + 1);
 			}
-			VulkanDrawable* drawable = &drawbleCache[currentDrawable];
-			currentDrawable++;
+			VulkanDrawable* drawable = &drawbles_[currentDrawable_];
+			currentDrawable_++;
 
 			drawable->SetRenderDevice(this);
 			return drawable;
@@ -132,47 +134,43 @@ namespace Vulkan {
 		static bool CheckValidationLayerSupport();
 
 		void InitMesh(Mesh* mesh) override { mesh->SetRenderDevice(this); }
-		GLFWwindow* pWnd;
+		GLFWwindow* pWnd_;
 
-		VkCom<VkInstance> instance{ vkDestroyInstance };
-		VkCom<VkDebugReportCallbackEXT> callback{ instance, DestroyDebugReportCallbackEXT };
-		VkCom<VkSurfaceKHR> surface{ instance, vkDestroySurfaceKHR };
+		VkCom<VkInstance> instance_{ vkDestroyInstance };
+		VkCom<VkDebugReportCallbackEXT> callback_{ instance_, DestroyDebugReportCallbackEXT };
+		VkCom<VkSurfaceKHR> surface{ instance_, vkDestroySurfaceKHR };
 
-		VkPhysicalDevice physicalDevice = nullptr;
-		VkCom<VkDevice> device{ vkDestroyDevice };
+		VkPhysicalDevice physicalDevice_ = nullptr;
+		VkCom<VkDevice> device_{ vkDestroyDevice };
 
-		VkQueue graphicsQueue;
-		VkQueue presentQueue;
+		VkQueue graphicsQueue_;
+		VkQueue presentQueue_;
 
-		VkCom<VkSwapchainKHR> swapChain{ device, vkDestroySwapchainKHR };
-		std::vector<VkImage> swapChainImages;
-		VkFormat swapChainImageFormat;
-		VkExtent2D swapChainExtent;
-		std::vector<VkCom<VkImageView>> swapChainImageViews;
-		std::vector<VkCom<VkFramebuffer>> swapChainFramebuffers;
-
-		VkCom<VkCommandPool> commandPool{ device, vkDestroyCommandPool };
-
-		VkCom<VkRenderPass> renderPass{ device, vkDestroyRenderPass };;
-
+		VkCom<VkSwapchainKHR> swapChain_{ device_, vkDestroySwapchainKHR };
+		std::vector<VkImage> swapChainImages_;
+		VkFormat swapChainImageFormat_;
+		VkExtent2D swapChainExtent_;
+		VkCom<VkCommandPool> cmdPool_{ device_, vkDestroyCommandPool };
+		VkCom<VkRenderPass> renderPass_{ device_, vkDestroyRenderPass };
 		VulkanPipeline pipeline;
+		//framebuffer
+		VkCom<VkImage> depthImage_{ device_, vkDestroyImage };
+		VkCom<VkDeviceMemory> depthImageMemory_{ device_, vkFreeMemory };
+		VkCom<VkImageView> depthImageView_{ device_, vkDestroyImageView };
+		VkCom<VkSemaphore> imageAvailableSemaphore_{ device_, vkDestroySemaphore };
+		VkCom<VkSemaphore> renderFinishedSemaphore_{ device_, vkDestroySemaphore };
 
-		std::unordered_map<ShaderId, VulkanShader> shadercache;
-		std::unordered_map<TextureId, VulkanTexture> texturecache;
-		
+		uint32_t currentDrawable_ = 0;
 
-		VkCom<VkImage> depthImage{ device, vkDestroyImage };
-		VkCom<VkDeviceMemory> depthImageMemory{ device, vkFreeMemory };
-		VkCom<VkImageView> depthImageView{ device, vkDestroyImageView };
+		std::vector<VulkanDrawable> drawbles_;
+		std::vector<VkCommandBuffer> cmdBuffers_;
+		std::vector<VkCom<VkImageView>> swapChainImageViews_;
+		std::vector<VkCom<VkFramebuffer>> swapChainFramebuffers_;
 
-
-		std::vector<VkCommandBuffer> commandBuffers;
-
-		VkCom<VkSemaphore> imageAvailableSemaphore{ device, vkDestroySemaphore };
-		VkCom<VkSemaphore> renderFinishedSemaphore{ device, vkDestroySemaphore };
-
-		uint32_t currentDrawable = 0;
-		std::vector<VulkanDrawable> drawbleCache;
+		std::unordered_map<ShaderId, VulkanShader> shadercache_;
+		std::unordered_map<TextureId, VulkanTexture> textures_;
+		std::unordered_map<uint64_t, VulkanPipeline> pipelines_;
 
 	};
 }
+#endif

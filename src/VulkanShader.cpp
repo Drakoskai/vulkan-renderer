@@ -18,8 +18,8 @@ namespace Vulkan
 		auto vertShaderCode = ReadFile(shaderId.GetVertexShader());
 		auto fragShaderCode = ReadFile(shaderId.GetFragmentShader());
 
-		vertShaderModule = { pRenderer->device, vkDestroyShaderModule };
-		fragShaderModule = { pRenderer->device, vkDestroyShaderModule };
+		vertShaderModule = { pRenderer->device_, vkDestroyShaderModule };
+		fragShaderModule = { pRenderer->device_, vkDestroyShaderModule };
 		pRenderer->CreateShaderModule(vertShaderCode, vertShaderModule);
 		pRenderer->CreateShaderModule(fragShaderCode, fragShaderModule);
 

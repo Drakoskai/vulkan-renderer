@@ -6,6 +6,7 @@
 
 #include "Scene.h"
 #include "Transform.h"
+#include "MeshRenderer.h"
 const int WIDTH = 800;
 const int HEIGHT = 600;
 

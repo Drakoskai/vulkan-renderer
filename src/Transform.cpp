@@ -11,8 +11,8 @@ Transform* Transform::Get(uint32_t index) {
 }
 
 void Transform::LookAt(const Vec3& localPosition, const Vec3& center, const Vec3& up) {
-	mRotation = lookAt(localPosition, center, up);
-	mPosition = localPosition;
+	rot_ = lookAt(localPosition, center, up);
+	pos_ = localPosition;
 }
 
 void Transform::SetParent(Transform* parent) {
@@ -23,12 +23,12 @@ void Transform::SetParent(Transform* parent) {
 			return;
 		}
 
-		comp = comp->mParent == -1 ? nullptr : &TransformComponents[comp->mParent];
+		comp = comp->parent_ == -1 ? nullptr : &TransformComponents[comp->parent_];
 	}
 
 	for(uint32_t componentIndex = 0; componentIndex < TransformComponents.size(); ++componentIndex) {
 		if(&TransformComponents[componentIndex] == parent) {
-			mParent = static_cast<int>(componentIndex);
+			parent_ = static_cast<int>(componentIndex);
 			return;
 		}
 	}
@@ -36,21 +36,21 @@ void Transform::SetParent(Transform* parent) {
 
 Transform* Transform::GetParent() const {
 	using namespace Components;
-	return mParent == -1 ? nullptr : &TransformComponents[mParent];
+	return parent_ == -1 ? nullptr : &TransformComponents[parent_];
 }
 
 Vec3 Transform::GetForward() const {
-	Vec3 direction = { mModel[0][2], mModel[1][2], mModel[2][2] };
+	Vec3 direction = { model_[0][2], model_[1][2], model_[2][2] };
 	return direction;
 }
 
 Vec3 Transform::GetUp() const {
-	Vec3 up = { mModel[0][1], mModel[1][1], mModel[2][1] };
+	Vec3 up = { model_[0][1], model_[1][1], model_[2][1] };
 	return up;
 }
 
 Vec3 Transform::GetRight() const {
-	Vec3 right = { mModel[0][0], mModel[1][0], mModel[2][0] };
+	Vec3 right = { model_[0][0], model_[1][0], model_[2][0] };
 	return right;
 }
 
@@ -64,28 +64,28 @@ void Transform::UpdateLocalMatrices() {
 	}
 
 	for(uint32_t componentIndex = 0; componentIndex < nextFreeTransformComponent; ++componentIndex) {
-		int parent = TransformComponents[componentIndex].mParent;
-		Matrix transform = TransformComponents[componentIndex].mModel;
-		Quaternion worldRotation = TransformComponents[componentIndex].mRotation;
-		Vec3 worldPosition = TransformComponents[componentIndex].mPosition;
+		int parent = TransformComponents[componentIndex].parent_;
+		Matrix transform = TransformComponents[componentIndex].model_;
+		Quaternion worldRotation = TransformComponents[componentIndex].rot_;
+		Vec3 worldPosition = TransformComponents[componentIndex].pos_;
 
 		while(parent != -1) {
 			transform = TransformComponents[parent].GetModel() * transform;
-			worldRotation = worldRotation * TransformComponents[parent].mRotation;
-			worldPosition = worldPosition * TransformComponents[parent].mPosition;
+			worldRotation = worldRotation * TransformComponents[parent].rot_;
+			worldPosition = worldPosition * TransformComponents[parent].pos_;
 
-			parent = TransformComponents[parent].mParent;
+			parent = TransformComponents[parent].parent_;
 		}
 
-		TransformComponents[componentIndex].mWorldModel = transform;
-		TransformComponents[componentIndex].mWorldPosition = worldPosition;
-		TransformComponents[componentIndex].mWorldRotation = worldRotation;
+		TransformComponents[componentIndex].world_ = transform;
+		TransformComponents[componentIndex].worldPos_ = worldPosition;
+		TransformComponents[componentIndex].worldRot_ = worldRotation;
 
-		if(TransformComponents[componentIndex].pObj) {
-			Camera* camera = TransformComponents[componentIndex].pObj->GetComponent<Camera>();
+		if(TransformComponents[componentIndex].pObj_) {
+			Camera* camera = TransformComponents[componentIndex].pObj_->GetComponent<Camera>();
 			if(camera) {
 				Transform& trans = TransformComponents[componentIndex];
-				Vec3 eye = trans.mWorldPosition;
+				Vec3 eye = trans.worldPos_;
 				Vec3 center = trans.GetForward();
 				Vec3 up = trans.GetUp();
 				camera->SetView(lookAt(eye, center, up));
@@ -95,10 +95,10 @@ void Transform::UpdateLocalMatrices() {
 }
 
 void Transform::SolveLocalMatrix() {
-	Matrix rotation = mat4_cast(mRotation);
+	Matrix rotation = mat4_cast(rot_);
 	Matrix scale;
-	glm::scale(scale, Vec3(mLocalScale, mLocalScale, mLocalScale));
+	glm::scale(scale, Vec3(scale_, scale_, scale_));
 	Matrix translation;
-	translate(translation, mPosition);
-	mModel = scale * translation * rotation;
+	translate(translation, pos_);
+	model_ = scale * translation * rotation;
 }

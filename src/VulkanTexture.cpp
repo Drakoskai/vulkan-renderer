@@ -8,18 +8,18 @@ namespace Vulkan
 	VulkanTexture::VulkanTexture() : mipMapLevels(0), layerCount(0), textureWidth(0), textureHeight(0), pRenderer(nullptr) {}
 
 	VulkanTexture::VulkanTexture(VulkanRenderer* renderer) : mipMapLevels(0), layerCount(0), textureWidth(0), textureHeight(0), pRenderer(renderer) {
-		textureImage = { pRenderer->device, vkDestroyImage };
-		textureImageMemory = { pRenderer->device, vkFreeMemory };
-		textureImageView = { pRenderer->device, vkDestroyImageView };
-		textureSampler = { pRenderer->device, vkDestroySampler };
+		textureImage = { pRenderer->device_, vkDestroyImage };
+		textureImageMemory = { pRenderer->device_, vkFreeMemory };
+		textureImageView = { pRenderer->device_, vkDestroyImageView };
+		textureSampler = { pRenderer->device_, vkDestroySampler };
 	}
 
 	void VulkanTexture::SetRenderDevice(VulkanRenderer* renderer) {
 		pRenderer = renderer;
-		textureImage = { pRenderer->device, vkDestroyImage };
-		textureImageMemory = { pRenderer->device, vkFreeMemory };
-		textureImageView = { pRenderer->device, vkDestroyImageView };
-		textureSampler = { pRenderer->device, vkDestroySampler };
+		textureImage = { pRenderer->device_, vkDestroyImage };
+		textureImageMemory = { pRenderer->device_, vkFreeMemory };
+		textureImageView = { pRenderer->device_, vkDestroyImageView };
+		textureSampler = { pRenderer->device_, vkDestroySampler };
 	}
 
 	void VulkanTexture::Generate() {
@@ -43,8 +43,8 @@ namespace Vulkan
 		}
 		textureWidth = texWidth;
 		textureHeight = textureHeight;
-		VkCom<VkImage> stagingImage{ pRenderer->device, vkDestroyImage };
-		VkCom<VkDeviceMemory> stagingImageMemory{ pRenderer->device, vkFreeMemory };
+		VkCom<VkImage> stagingImage{ pRenderer->device_, vkDestroyImage };
+		VkCom<VkDeviceMemory> stagingImageMemory{ pRenderer->device_, vkFreeMemory };
 		pRenderer->CreateImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingImage, stagingImageMemory);
 
 		VkImageSubresource subresource = {};
@@ -53,10 +53,10 @@ namespace Vulkan
 		subresource.arrayLayer = 0;
 
 		VkSubresourceLayout stagingImageLayout;
-		vkGetImageSubresourceLayout(pRenderer->device, stagingImage, &subresource, &stagingImageLayout);
+		vkGetImageSubresourceLayout(pRenderer->device_, stagingImage, &subresource, &stagingImageLayout);
 
 		void* data;
-		vkMapMemory(pRenderer->device, stagingImageMemory, 0, imageSize, 0, &data);
+		vkMapMemory(pRenderer->device_, stagingImageMemory, 0, imageSize, 0, &data);
 
 		if (stagingImageLayout.rowPitch == texWidth * 4) {
 			memcpy(data, pixels, static_cast<size_t>(imageSize));
@@ -69,7 +69,7 @@ namespace Vulkan
 			}
 		}
 
-		vkUnmapMemory(pRenderer->device, stagingImageMemory);
+		vkUnmapMemory(pRenderer->device_, stagingImageMemory);
 
 		stbi_image_free(pixels);
 
@@ -102,7 +102,7 @@ namespace Vulkan
 		samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-		if (vkCreateSampler(pRenderer->device, &samplerInfo, nullptr, textureSampler.replace()) != VK_SUCCESS) {
+		if (vkCreateSampler(pRenderer->device_, &samplerInfo, nullptr, textureSampler.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create texture sampler!");
 		}
 	}

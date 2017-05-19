@@ -1,4 +1,5 @@
-#pragma once
+#ifndef VULKAN_PIPELINE_H_
+#define VULKAN_PIPELINE_H_
 
 #include <vulkan/vulkan.h>
 #include "VkCom.h"
@@ -20,3 +21,4 @@ namespace Vulkan {
 		void CreatePipeline(VkCom<VkPipeline>& pipeline, const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions, const std::vector<VkVertexInputBindingDescription>& bindingDescription, const std::vector<VkDescriptorSetLayout>& layouts, const ShaderId shaderid);
 	};
 }
+#endif

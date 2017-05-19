@@ -3,20 +3,20 @@
 #include "Material.h"
 #include "Util.h"
 
-GameObject* MeshRenderer::GetGameObject() const { return pObj; }
+GameObject* MeshRenderer::GetGameObject() const { return pObj_; }
 
 void MeshRenderer::SetMaterial(Material* material, uint32_t subMeshIndex) {
-	if (subMeshIndex >= 0 && subMeshIndex < uint32_t(mMaterials.size())) {
-		mMaterials[subMeshIndex] = material;
+	if (subMeshIndex >= 0 && subMeshIndex < uint32_t(materials_.size())) {
+		materials_[subMeshIndex] = material;
 	}
 }
 
 void MeshRenderer::SetMesh(Mesh* mesh) {
-	SafeDelete(pMesh);
-	pMesh = mesh;
+	SafeDelete(pMesh_);
+	pMesh_ = mesh;
 	if (mesh != nullptr) {
-		mMaterials.resize(mesh->GetSubMeshes().size());
-		pMesh->Generate();
+		materials_.resize(mesh->GetSubMeshes().size());
+		pMesh_->Generate();
 	}
 }
 

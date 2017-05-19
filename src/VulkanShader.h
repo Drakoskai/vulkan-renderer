@@ -1,4 +1,5 @@
 #pragma once
+
 #include <vulkan/vulkan.h>
 #include "VkCom.h"
 #include "GraphicsStructs.h"
@@ -17,5 +18,4 @@ namespace Vulkan
 		void SetRenderDevice(VulkanRenderer* renderer) { pRenderer = renderer; }
 		void LoadShaders(ShaderId shaderId);
 	};
-
 }

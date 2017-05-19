@@ -8,11 +8,11 @@ GameObject::GameObject(const GameObject& other) {
 }
 
 GameObject& GameObject::operator=(const GameObject& other) {
-	mName = other.mName;
+	name_ = other.name_;
 
 	for(uint64_t i = 0; i < MaxComponents; ++i) {
-		mComponents[i].type = -1;
-		mComponents[i].handle = InvalidComponentIndex;
+		components_[i].type = -1;
+		components_[i].handle = InvalidComponentIndex;
 	}
 
 	if(other.GetComponent<Transform>()) {
@@ -36,16 +36,16 @@ GameObject& GameObject::operator=(const GameObject& other) {
 bool GameObject::IsEnabled() const {
 	const Transform* transform = GetComponent<Transform>();
 	while(transform) {
-		if(transform->GetGameObject() && !transform->GetGameObject()->mIsEnabled) {
+		if(transform->GetGameObject() && !transform->GetGameObject()->isEnabled_) {
 			return false;
 		}
 
 		transform = transform->GetParent();
 	}
 
-	return mIsEnabled;
+	return isEnabled_;
 }
 
 uint32_t GameObject::GetNextComponentIndex() {
-	return mNextFreeComponentIndex >= MaxComponents ? InvalidComponentIndex : mNextFreeComponentIndex++;
+	return nextFreeComponentIndex_ >= MaxComponents ? InvalidComponentIndex : nextFreeComponentIndex_++;
 }

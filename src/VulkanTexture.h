@@ -27,5 +27,4 @@ namespace Vulkan {
 		void CreateTextureImageView();
 		void CreateTextureSampler();
 	};
-
 }

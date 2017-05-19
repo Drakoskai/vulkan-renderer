@@ -7,34 +7,34 @@ namespace Vulkan {
 	VulkanDrawable::VulkanDrawable() : pRenderer(nullptr), mNumIndices(0) {}
 
 	VulkanDrawable::VulkanDrawable(VulkanRenderer* renderer) : pPipeline(nullptr), pRenderer(renderer), mNumIndices(0) {
-		vertexBuffer = { pRenderer->device, vkDestroyBuffer };
-		vertexBufferMemory = { pRenderer->device, vkFreeMemory };
-		indexBuffer = { pRenderer->device, vkDestroyBuffer };
-		indexBufferMemory = { pRenderer->device, vkFreeMemory };
-		uniformStagingBuffer = { pRenderer->device, vkDestroyBuffer };
-		uniformStagingBufferMemory = { pRenderer->device, vkFreeMemory };
-		uniformBuffer = { pRenderer->device, vkDestroyBuffer };
-		uniformBufferMemory = { pRenderer->device, vkFreeMemory };
-		descriptorPool = { pRenderer->device, vkDestroyDescriptorPool };
-		descriptorSetLayout = { pRenderer->device, vkDestroyDescriptorSetLayout };
-		pPipeline = { pRenderer->device, vkDestroyPipeline };
+		vertexBuffer = { pRenderer->device_, vkDestroyBuffer };
+		vertexBufferMemory = { pRenderer->device_, vkFreeMemory };
+		indexBuffer = { pRenderer->device_, vkDestroyBuffer };
+		indexBufferMemory = { pRenderer->device_, vkFreeMemory };
+		uniformStagingBuffer = { pRenderer->device_, vkDestroyBuffer };
+		uniformStagingBufferMemory = { pRenderer->device_, vkFreeMemory };
+		uniformBuffer = { pRenderer->device_, vkDestroyBuffer };
+		uniformBufferMemory = { pRenderer->device_, vkFreeMemory };
+		descriptorPool = { pRenderer->device_, vkDestroyDescriptorPool };
+		descriptorSetLayout = { pRenderer->device_, vkDestroyDescriptorSetLayout };
+		pPipeline = { pRenderer->device_, vkDestroyPipeline };
 	}
 
 	VulkanDrawable::~VulkanDrawable() {}
 
 	void VulkanDrawable::SetRenderDevice(VulkanRenderer* renderer) {
 		pRenderer = renderer;
-		vertexBuffer = { pRenderer->device, vkDestroyBuffer };
-		vertexBufferMemory = { pRenderer->device, vkFreeMemory };
-		indexBuffer = { pRenderer->device, vkDestroyBuffer };
-		indexBufferMemory = { pRenderer->device, vkFreeMemory };
-		uniformStagingBuffer = { pRenderer->device, vkDestroyBuffer };
-		uniformStagingBufferMemory = { pRenderer->device, vkFreeMemory };
-		uniformBuffer = { pRenderer->device, vkDestroyBuffer };
-		uniformBufferMemory = { pRenderer->device, vkFreeMemory };
-		descriptorPool = { pRenderer->device, vkDestroyDescriptorPool };
-		descriptorSetLayout = { pRenderer->device, vkDestroyDescriptorSetLayout };
-		pPipeline = { pRenderer->device, vkDestroyPipeline };
+		vertexBuffer = { pRenderer->device_, vkDestroyBuffer };
+		vertexBufferMemory = { pRenderer->device_, vkFreeMemory };
+		indexBuffer = { pRenderer->device_, vkDestroyBuffer };
+		indexBufferMemory = { pRenderer->device_, vkFreeMemory };
+		uniformStagingBuffer = { pRenderer->device_, vkDestroyBuffer };
+		uniformStagingBufferMemory = { pRenderer->device_, vkFreeMemory };
+		uniformBuffer = { pRenderer->device_, vkDestroyBuffer };
+		uniformBufferMemory = { pRenderer->device_, vkFreeMemory };
+		descriptorPool = { pRenderer->device_, vkDestroyDescriptorPool };
+		descriptorSetLayout = { pRenderer->device_, vkDestroyDescriptorSetLayout };
+		pPipeline = { pRenderer->device_, vkDestroyPipeline };
 	}
 
 	void VulkanDrawable::Generate(const std::vector<VertexPTN>& vertices, const std::vector<uint32_t>& indices, const Material& material) {
@@ -77,14 +77,14 @@ namespace Vulkan {
 	void VulkanDrawable::CreateVertexBuffer(const std::vector<VertexPTN>& vertices) {
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
-		VkCom<VkBuffer> stagingBuffer{ pRenderer->device, vkDestroyBuffer };
-		VkCom<VkDeviceMemory> stagingBufferMemory{ pRenderer->device, vkFreeMemory };
+		VkCom<VkBuffer> stagingBuffer{ pRenderer->device_, vkDestroyBuffer };
+		VkCom<VkDeviceMemory> stagingBufferMemory{ pRenderer->device_, vkFreeMemory };
 		pRenderer->CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
 		void* data;
-		vkMapMemory(pRenderer->device, stagingBufferMemory, 0, bufferSize, 0, &data);
+		vkMapMemory(pRenderer->device_, stagingBufferMemory, 0, bufferSize, 0, &data);
 		memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
-		vkUnmapMemory(pRenderer->device, stagingBufferMemory);
+		vkUnmapMemory(pRenderer->device_, stagingBufferMemory);
 
 		pRenderer->CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
 		pRenderer->CopyBuffer(stagingBuffer, vertexBuffer, bufferSize);
@@ -93,14 +93,14 @@ namespace Vulkan {
 	void VulkanDrawable::CreateIndexBuffer(const std::vector<uint32_t>& indices) {
 		VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
-		VkCom<VkBuffer> stagingBuffer{ pRenderer->device, vkDestroyBuffer };
-		VkCom<VkDeviceMemory> stagingBufferMemory{ pRenderer->device, vkFreeMemory };
+		VkCom<VkBuffer> stagingBuffer{ pRenderer->device_, vkDestroyBuffer };
+		VkCom<VkDeviceMemory> stagingBufferMemory{ pRenderer->device_, vkFreeMemory };
 		pRenderer->CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
 		void* data;
-		vkMapMemory(pRenderer->device, stagingBufferMemory, 0, bufferSize, 0, &data);
+		vkMapMemory(pRenderer->device_, stagingBufferMemory, 0, bufferSize, 0, &data);
 		memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
-		vkUnmapMemory(pRenderer->device, stagingBufferMemory);
+		vkUnmapMemory(pRenderer->device_, stagingBufferMemory);
 
 		pRenderer->CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
 
@@ -128,7 +128,7 @@ namespace Vulkan {
 		layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
 		layoutInfo.pBindings = bindings.data();
 
-		if (vkCreateDescriptorSetLayout(pRenderer->device, &layoutInfo, nullptr, descriptorSetLayout.replace()) != VK_SUCCESS) {
+		if (vkCreateDescriptorSetLayout(pRenderer->device_, &layoutInfo, nullptr, descriptorSetLayout.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create descriptor set layout!");
 		}
 	}
@@ -153,7 +153,7 @@ namespace Vulkan {
 		poolInfo.pPoolSizes = poolSizes.data();
 		poolInfo.maxSets = 1;
 
-		if (vkCreateDescriptorPool(pRenderer->device, &poolInfo, nullptr, descriptorPool.replace()) != VK_SUCCESS) {
+		if (vkCreateDescriptorPool(pRenderer->device_, &poolInfo, nullptr, descriptorPool.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create descriptor pool!");
 		}
 	}
@@ -166,7 +166,7 @@ namespace Vulkan {
 		allocInfo.descriptorSetCount = 1;
 		allocInfo.pSetLayouts = layouts;
 
-		if (vkAllocateDescriptorSets(pRenderer->device, &allocInfo, &descriptorSet) != VK_SUCCESS) {
+		if (vkAllocateDescriptorSets(pRenderer->device_, &allocInfo, &descriptorSet) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor set!");
 		}
 
@@ -196,6 +196,6 @@ namespace Vulkan {
 			descriptorWrites[1].pImageInfo = &diffuseTexture->imageInfo;
 		}
 
-		vkUpdateDescriptorSets(pRenderer->device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		vkUpdateDescriptorSets(pRenderer->device_, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}
 }

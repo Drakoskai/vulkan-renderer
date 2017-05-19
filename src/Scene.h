@@ -14,8 +14,7 @@ public:
 	void Frame();
 	
 private:
-	std::vector<GameObject*> gameObjects;
-	uint64_t nextFreeGameObject;
-	IRenderer* pRenderer;
-
+	std::vector<GameObject*> gameObjects_;
+	uint64_t nextFreeGameObject_;
+	IRenderer* pRenderer_;
 };

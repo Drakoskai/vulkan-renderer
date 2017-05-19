@@ -102,6 +102,9 @@
     <ClCompile Include="src\VulkanTexture.cpp">
       <Filter>Source Files\Render\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="src\PointLight.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Util.h">

@@ -19,15 +19,15 @@ public:
 	ProjectionType GetProjectionType() const;
 
 	class GameObject* GetGameObject() const;
-	void SetRenderOrder(uint32_t renderOrder) { m_renderOrder = renderOrder; }
-	uint32_t GetRenderOrder() const { return m_renderOrder; }
+	void SetRenderOrder(uint32_t renderOrder) { renderOrder_ = renderOrder; }
+	uint32_t GetRenderOrder() const { return renderOrder_; }
 	Vec3 GetForward() const;
 	Vec3 GetUp() const;
 	Vec3 GetRight() const;
-	float GetNear() const { return mNear; }
-	float GetFar() const { return mFar; }
-	float GetAspect() const { return mAspect; }
-	float GetFovDegrees() const { return foVd; }
+	float GetNear() const { return near_; }
+	float GetFar() const { return far_; }
+	float GetAspect() const { return aspect_; }
+	float GetFovDegrees() const { return foVd_; }
 	Matrix GetViewProj() const;
 
 	Camera() = default;
@@ -44,18 +44,18 @@ private:
 	static uint32_t New();
 	static Camera* Get(uint32_t index);
 
-	float foVd = 45.0f;
-	float mNear = 0;
-	float mFar = 1.0f;
-	float mAspect = 1.0f;
-	ProjectionType mProjection = ProjectionType::Perspective;
-	OrthoProperties mOrthoProperties;
-	Viewport mViewport;
-	Matrix mView{ };
-	Matrix mProj{ };
-	uint32_t m_renderOrder = 0;
+	float foVd_ = 45.0f;
+	float near_ = 0;
+	float far_ = 1.0f;
+	float aspect_ = 1.0f;
+	ProjectionType projection_ = ProjectionType::Perspective;
+	OrthoProperties orthoProperties_;
+	Viewport viewport_;
+	Matrix view_ { };
+	Matrix proj_ { };
+	uint32_t renderOrder_ = 0;
 
-	GameObject* pObj = nullptr;
+	GameObject* pObj_ = nullptr;
 };
 
 namespace Components {
