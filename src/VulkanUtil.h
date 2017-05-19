@@ -10,4 +10,5 @@ namespace Vulkan {
 
 	std::string VkResultToString(VkResult result);
 
+
 }

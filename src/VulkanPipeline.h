@@ -10,15 +10,21 @@ namespace Vulkan {
 	class VulkanDrawable;
 	class VulkanRenderer;
 
+	struct VertexBufferInfo {
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+		std::vector<VkVertexInputBindingDescription> bindingDescriptions;
+	};
+
 	struct VulkanPipeline {
 		VulkanRenderer* pRenderer;
-		VkCom<VkPipeline> pipeline;
+		VkCom<VkDescriptorSetLayout> descriptorSetLayout;
 		VkCom<VkPipelineLayout> pipelineLayout;
-
+		VkCom<VkPipeline> pipeline;
 		VulkanPipeline();
 		VulkanPipeline(VulkanRenderer* renderer);
 		void SetRenderDevice(VulkanRenderer* renderer);
-		void CreatePipeline(const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions, const std::vector<VkVertexInputBindingDescription>& bindingDescription, const std::vector<VkDescriptorSetLayout>& layouts, const ShaderId shaderid);
+		void CreatePipeline(const VertexBufferInfo& vertexInfo, const ShaderId shaderid);
+		void CreateDescriptorSetLayout();
 	};
 }
 #endif

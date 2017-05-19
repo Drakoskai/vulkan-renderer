@@ -47,11 +47,11 @@ namespace Vulkan {
 		void* data;
 		ubo.mvp = proj * view * model;
 		ubo.world = Matrix();
-		vkMapMemory(device_, drawbles_[0].uniformStagingBufferMemory, 0, sizeof(ubo), 0, &data);
+		vkMapMemory(device_, drawbles_[0].uniformStagingBufferMemory_, 0, sizeof(ubo), 0, &data);
 		memcpy(data, &ubo, sizeof(ubo));
-		vkUnmapMemory(device_, drawbles_[0].uniformStagingBufferMemory);
+		vkUnmapMemory(device_, drawbles_[0].uniformStagingBufferMemory_);
 
-		CopyBuffer(drawbles_[0].uniformStagingBuffer, drawbles_[0].uniformBuffer, sizeof(ubo));
+		CopyBuffer(drawbles_[0].uniformStagingBuffer_, drawbles_[0].uniformBuffer_, sizeof(ubo));
 	}
 
 	void VulkanRenderer::DrawFrame() {
@@ -122,7 +122,7 @@ namespace Vulkan {
 		if (textures_.find(textureid) == end(textures_)) {
 			VulkanTexture t;
 			textures_[textureid] = t;
-			textures_[textureid].file = textureid.GetTextureName();
+			textures_[textureid].file_ = textureid.GetTextureName();
 			textures_[textureid].SetRenderDevice(this);
 			textures_[textureid].Generate();
 		}
@@ -508,6 +508,22 @@ namespace Vulkan {
 			renderPassInfo.pClearValues = clearValues.data();
 
 			vkCmdBeginRenderPass(cmdBuffers_[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+			VkViewport viewport = {
+			0.0f,
+			0.0f,
+			static_cast<float>(swapChainExtent_.width),
+			static_cast<float>(swapChainExtent_.height),
+			0.0f,
+			1.0f };
+
+			vkCmdSetViewport(cmdBuffers_[i], 0, 1, &viewport);
+
+			VkRect2D scissor = {
+			{ 0, 0 },
+			swapChainExtent_ };
+
+			vkCmdSetScissor(cmdBuffers_[i], 0, 1, &scissor);
 
 			for (VulkanDrawable& drawable : drawbles_) {
 				drawable.RecordDrawCommand(cmdBuffers_[i]);

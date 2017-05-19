@@ -5,58 +5,58 @@
 
 namespace Vulkan
 {
-	VulkanTexture::VulkanTexture() : mipMapLevels(0), layerCount(0), textureWidth(0), textureHeight(0), pRenderer(nullptr) {}
+	VulkanTexture::VulkanTexture() : mipMapLevels_(0), layerCount_(0), textureWidth_(0), textureHeight_(0), pRenderer_(nullptr) {}
 
-	VulkanTexture::VulkanTexture(VulkanRenderer* renderer) : mipMapLevels(0), layerCount(0), textureWidth(0), textureHeight(0), pRenderer(renderer) {
-		textureImage = { pRenderer->device_, vkDestroyImage };
-		textureImageMemory = { pRenderer->device_, vkFreeMemory };
-		textureImageView = { pRenderer->device_, vkDestroyImageView };
-		textureSampler = { pRenderer->device_, vkDestroySampler };
+	VulkanTexture::VulkanTexture(VulkanRenderer* renderer) : mipMapLevels_(0), layerCount_(0), textureWidth_(0), textureHeight_(0), pRenderer_(renderer) {
+		textureImage_ = { pRenderer_->device_, vkDestroyImage };
+		textureImageMemory_ = { pRenderer_->device_, vkFreeMemory };
+		textureImageView_ = { pRenderer_->device_, vkDestroyImageView };
+		textureSampler_ = { pRenderer_->device_, vkDestroySampler };
 	}
 
 	void VulkanTexture::SetRenderDevice(VulkanRenderer* renderer) {
-		pRenderer = renderer;
-		textureImage = { pRenderer->device_, vkDestroyImage };
-		textureImageMemory = { pRenderer->device_, vkFreeMemory };
-		textureImageView = { pRenderer->device_, vkDestroyImageView };
-		textureSampler = { pRenderer->device_, vkDestroySampler };
+		pRenderer_ = renderer;
+		textureImage_ = { pRenderer_->device_, vkDestroyImage };
+		textureImageMemory_ = { pRenderer_->device_, vkFreeMemory };
+		textureImageView_ = { pRenderer_->device_, vkDestroyImageView };
+		textureSampler_ = { pRenderer_->device_, vkDestroySampler };
 	}
 
 	void VulkanTexture::Generate() {
 		CreateTextureImage();
 		CreateTextureImageView();
 		CreateTextureSampler();
-		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = textureImageView;
-		imageInfo.sampler = textureSampler;
+		imageInfo_.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo_.imageView = textureImageView_;
+		imageInfo_.sampler = textureSampler_;
 	}
 
 	void VulkanTexture::CreateTextureImage() {
 		int texWidth;
 		int texHeight;
 		int texChannels;
-		stbi_uc* pixels = stbi_load(file.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+		stbi_uc* pixels = stbi_load(file_.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 		VkDeviceSize imageSize = texWidth * texHeight * 4;
 
 		if (!pixels) {
 			throw std::runtime_error("failed to load texture image!");
 		}
-		textureWidth = texWidth;
-		textureHeight = textureHeight;
-		VkCom<VkImage> stagingImage{ pRenderer->device_, vkDestroyImage };
-		VkCom<VkDeviceMemory> stagingImageMemory{ pRenderer->device_, vkFreeMemory };
-		pRenderer->CreateImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingImage, stagingImageMemory);
+		textureWidth_ = texWidth;
+		textureHeight_ = textureHeight_;
+		VkCom<VkImage> stagingImage{ pRenderer_->device_, vkDestroyImage };
+		VkCom<VkDeviceMemory> stagingImageMemory{ pRenderer_->device_, vkFreeMemory };
+		pRenderer_->CreateImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_LINEAR, VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingImage, stagingImageMemory);
 
-		VkImageSubresource subresource = {};
+		VkImageSubresource subresource;
 		subresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		subresource.mipLevel = 0;
 		subresource.arrayLayer = 0;
 
 		VkSubresourceLayout stagingImageLayout;
-		vkGetImageSubresourceLayout(pRenderer->device_, stagingImage, &subresource, &stagingImageLayout);
+		vkGetImageSubresourceLayout(pRenderer_->device_, stagingImage, &subresource, &stagingImageLayout);
 
 		void* data;
-		vkMapMemory(pRenderer->device_, stagingImageMemory, 0, imageSize, 0, &data);
+		vkMapMemory(pRenderer_->device_, stagingImageMemory, 0, imageSize, 0, &data);
 
 		if (stagingImageLayout.rowPitch == texWidth * 4) {
 			memcpy(data, pixels, static_cast<size_t>(imageSize));
@@ -69,21 +69,19 @@ namespace Vulkan
 			}
 		}
 
-		vkUnmapMemory(pRenderer->device_, stagingImageMemory);
+		vkUnmapMemory(pRenderer_->device_, stagingImageMemory);
 
 		stbi_image_free(pixels);
 
-		pRenderer->CreateImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
-
-		pRenderer->TransitionImageLayout(stagingImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_PREINITIALIZED, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
-		pRenderer->TransitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_PREINITIALIZED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-		pRenderer->CopyImage(stagingImage, textureImage, texWidth, texHeight);
-
-		pRenderer->TransitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		pRenderer_->CreateImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage_, textureImageMemory_);
+		pRenderer_->TransitionImageLayout(stagingImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_PREINITIALIZED, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+		pRenderer_->TransitionImageLayout(textureImage_, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_PREINITIALIZED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		pRenderer_->CopyImage(stagingImage, textureImage_, texWidth, texHeight);
+		pRenderer_->TransitionImageLayout(textureImage_, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 	}
 
 	void VulkanTexture::CreateTextureImageView() {
-		pRenderer->CreateImageView(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, textureImageView);
+		pRenderer_->CreateImageView(textureImage_, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT, textureImageView_);
 	}
 
 	void VulkanTexture::CreateTextureSampler() {
@@ -102,7 +100,7 @@ namespace Vulkan
 		samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-		if (vkCreateSampler(pRenderer->device_, &samplerInfo, nullptr, textureSampler.replace()) != VK_SUCCESS) {
+		if (vkCreateSampler(pRenderer_->device_, &samplerInfo, nullptr, textureSampler_.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create texture sampler!");
 		}
 	}

@@ -1,23 +1,25 @@
-#pragma once
+#ifndef VULKAN_TEXTURE_H_
+#define VULKAN_TEXTURE_H_
+
 #include <vulkan/vulkan.h>
 #include "VkCom.h"
 
 namespace Vulkan {
 	class VulkanRenderer;
 	struct VulkanTexture {
-		std::string file;
-		uint32_t mipMapLevels;
-		uint32_t layerCount;
-		uint32_t textureWidth;
-		uint32_t textureHeight;
+		std::string file_;
+		uint32_t mipMapLevels_;
+		uint32_t layerCount_;
+		uint32_t textureWidth_;
+		uint32_t textureHeight_;
 
-		VkCom<VkImage> textureImage;
-		VkCom<VkDeviceMemory> textureImageMemory;
-		VkCom<VkImageView> textureImageView;
-		VkCom<VkSampler> textureSampler;
-		VkDescriptorImageInfo imageInfo;
+		VkCom<VkImage> textureImage_;
+		VkCom<VkDeviceMemory> textureImageMemory_;
+		VkCom<VkImageView> textureImageView_;
+		VkCom<VkSampler> textureSampler_;
+		VkDescriptorImageInfo imageInfo_;
 
-		VulkanRenderer* pRenderer;
+		VulkanRenderer* pRenderer_;
 
 		VulkanTexture();
 		explicit VulkanTexture(VulkanRenderer* renderer);
@@ -28,3 +30,4 @@ namespace Vulkan {
 		void CreateTextureSampler();
 	};
 }
+#endif

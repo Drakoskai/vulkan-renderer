@@ -8,8 +8,7 @@ SubMesh::SubMesh(Vulkan::VulkanRenderer* renderer) : pRenderer(renderer), aabbMi
 void SubMesh::Generate() {
 	if (!pRenderer) { return; }
 	SolveAABB();
-	buffer = pRenderer->GetDrawable();
-	buffer->Generate(vertices, indices, material);
+	pRenderer->GetDrawable()->Generate(vertices, indices, material);
 }
 
 void SubMesh::SolveAABB() {

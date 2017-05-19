@@ -5,37 +5,36 @@
 
 namespace Vulkan
 {
+	VulkanShader::VulkanShader() : pRenderer_(nullptr) {}
 
-	VulkanShader::VulkanShader() : pRenderer(nullptr) {}
-
-	VulkanShader::VulkanShader(VulkanRenderer* pRenderer) : pRenderer(pRenderer) {}
+	VulkanShader::VulkanShader(VulkanRenderer* pRenderer) : pRenderer_(pRenderer) {}
 
 	void VulkanShader::LoadShaders(ShaderId shaderId) {
-		if (!pRenderer) {
+		if (!pRenderer_) {
 			throw std::runtime_error("Vulkan Shader not intialized!");
 		}
 
 		auto vertShaderCode = ReadFile(shaderId.GetVertexShader());
 		auto fragShaderCode = ReadFile(shaderId.GetFragmentShader());
 
-		vertShaderModule = { pRenderer->device_, vkDestroyShaderModule };
-		fragShaderModule = { pRenderer->device_, vkDestroyShaderModule };
-		pRenderer->CreateShaderModule(vertShaderCode, vertShaderModule);
-		pRenderer->CreateShaderModule(fragShaderCode, fragShaderModule);
+		vertShaderModule_ = { pRenderer_->device_, vkDestroyShaderModule };
+		fragShaderModule_ = { pRenderer_->device_, vkDestroyShaderModule };
+		pRenderer_->CreateShaderModule(vertShaderCode, vertShaderModule_);
+		pRenderer_->CreateShaderModule(fragShaderCode, fragShaderModule_);
 
 		VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
 		vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-		vertShaderStageInfo.module = vertShaderModule;
+		vertShaderStageInfo.module = vertShaderModule_;
 		vertShaderStageInfo.pName = "main";
 
 		VkPipelineShaderStageCreateInfo fragShaderStageInfo = {};
 		fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-		fragShaderStageInfo.module = fragShaderModule;
+		fragShaderStageInfo.module = fragShaderModule_;
 		fragShaderStageInfo.pName = "main";
 
-		shaderStages[0] = vertShaderStageInfo;
-		shaderStages[1] = fragShaderStageInfo;
+		shaderStages_.push_back(vertShaderStageInfo);
+		shaderStages_.push_back(fragShaderStageInfo);
 	}
 }

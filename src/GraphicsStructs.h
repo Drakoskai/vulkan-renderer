@@ -22,7 +22,6 @@ private:
 	std::string vertexshader;
 	std::string fragmentshader;
 public:
-
 	size_t vertHash = 0;
 	size_t fragHash = 0;
 	ShaderId() : vertexshader(DefaultVertexShader), fragmentshader(DefaultFragmentShader) {
@@ -112,7 +111,6 @@ public:
 	bool operator<(const TextureId& other) const {
 		return HashCode() < other.HashCode();
 	}
-
 };
 
 namespace std {
@@ -123,8 +121,6 @@ namespace std {
 	};
 }
 
-
-
 struct Viewport {
 	int x = 0;
 	int y = 0;
@@ -132,7 +128,7 @@ struct Viewport {
 	int height = 0;
 };
 
-struct PipeLineContext {
+struct PipelineContext {
 	BlendMode blendMode;
 	CullMode cullMode;
 	DepthFunction depthFunction;
