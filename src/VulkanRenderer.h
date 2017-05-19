@@ -81,6 +81,7 @@ namespace Vulkan {
 		void PrepareFrame() override;
 		void DrawFrame() override;
 		void EndFrame() override;
+		VulkanDrawable* GetDrawable();
 		VulkanShader* GetShader(ShaderId shaderid);
 		VulkanTexture* GetTexture(TextureId textureid);
 		VulkanPipeline* GetPipeline(uint64_t pipelinehash);
@@ -99,18 +100,6 @@ namespace Vulkan {
 		void CreateCommandPool();
 		void CreateDepthResources();
 		void CreateFramebuffers();
-
-		VulkanDrawable* GetDrawable() {
-			if (drawbles_.size() == currentDrawable_) {
-				drawbles_.resize(currentDrawable_ + 1);
-			}
-			VulkanDrawable* drawable = &drawbles_[currentDrawable_];
-			currentDrawable_++;
-
-			drawable->SetRenderDevice(this);
-			return drawable;
-		}
-
 		void CreateCommandBuffers();
 		void CreateSemaphores();
 
@@ -162,12 +151,10 @@ namespace Vulkan {
 		VkCom<VkSemaphore> renderFinishedSemaphore_{ device_, vkDestroySemaphore };
 
 		uint32_t currentDrawable_ = 0;
-
-		std::vector<VulkanDrawable> drawbles_;
+		std::vector<VulkanDrawable> drawables_;
 		std::vector<VkCommandBuffer> cmdBuffers_;
 		std::vector<VkCom<VkImageView>> swapChainImageViews_;
 		std::vector<VkCom<VkFramebuffer>> swapChainFramebuffers_;
-
 		std::unordered_map<ShaderId, VulkanShader> shadercache_;
 		std::unordered_map<TextureId, VulkanTexture> textures_;
 		std::unordered_map<uint64_t, VulkanPipeline> pipelines_;

@@ -7,6 +7,7 @@
 #include "VulkanPipeline.h"
 #include "VulkanShader.h"
 #include "VulkanVertexBuffer.h"
+#include "Material.h"
 
 namespace Vulkan {
 	class VulkanRenderer;
@@ -21,21 +22,23 @@ namespace Vulkan {
 		void RecordDrawCommand(const VkCommandBuffer& commandBuffer) const;
 		void CreateUniformBuffer();
 		void CreateDescriptorPool();
-		void CreateDescriptorSet();
+		void CreateDescriptorSet();	
+		const VkCom<VkBuffer>& GetUniformBuffer() const { return uniformBuffer_; }
+		const VkCom<VkBuffer>& GetUniformStagingBuffer() const { return uniformStagingBuffer_; }
+		const VkCom<VkDeviceMemory>& GetUniformBufferMemory() const { return uniformBufferMemory_; }
+		const VkCom<VkDeviceMemory>& GetUniformStagingMemory() const { return uniformStagingBufferMemory_; }
 
+	private:
 		VulkanVertexBuffer vertexBuffer_;
+		VkCom<VkBuffer> uniformBuffer_;
 		VkCom<VkBuffer> uniformStagingBuffer_;
 		VkCom<VkDeviceMemory> uniformStagingBufferMemory_;
-		VkCom<VkBuffer> uniformBuffer_;
 		VkCom<VkDeviceMemory> uniformBufferMemory_;
-		VkCom<VkDescriptorPool> descriptorPool_;		
+		VkCom<VkDescriptorPool> descriptorPool_;
 		VkDescriptorSet descriptorSet_ = VK_NULL_HANDLE;
-
+		Material material_;
+		uint32_t numIndices_;
 		VulkanPipeline* pPipeline_;
 		VulkanRenderer* pRenderer_;
-		Material material_;
-		
-	private:
-		uint32_t numIndices_;
 	};
 }

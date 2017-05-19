@@ -8,13 +8,7 @@ namespace Vulkan {
 
 	VulkanRenderer::VulkanRenderer(GLFWwindow* window) : pWnd_(window), graphicsQueue_(nullptr), presentQueue_(nullptr), swapChainImageFormat_() {}
 
-	VulkanRenderer::~VulkanRenderer() {
-		vkQueueWaitIdle(graphicsQueue_);
-		drawbles_.clear();
-		pipelines_.clear();
-		textures_.clear();
-		shadercache_.clear();
-	}
+	VulkanRenderer::~VulkanRenderer() {	vkDeviceWaitIdle(device_); }
 
 	void VulkanRenderer::Init() {
 		CreateInstance();
@@ -34,7 +28,6 @@ namespace Vulkan {
 
 	void VulkanRenderer::PrepareFrame() {
 		static auto startTime = std::chrono::high_resolution_clock::now();
-
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
 
@@ -47,11 +40,11 @@ namespace Vulkan {
 		void* data;
 		ubo.mvp = proj * view * model;
 		ubo.world = Matrix();
-		vkMapMemory(device_, drawbles_[0].uniformStagingBufferMemory_, 0, sizeof(ubo), 0, &data);
+		vkMapMemory(device_, drawables_[0].GetUniformStagingMemory(), 0, sizeof(ubo), 0, &data);
 		memcpy(data, &ubo, sizeof(ubo));
-		vkUnmapMemory(device_, drawbles_[0].uniformStagingBufferMemory_);
+		vkUnmapMemory(device_, drawables_[0].GetUniformStagingMemory());
 
-		CopyBuffer(drawbles_[0].uniformStagingBuffer_, drawbles_[0].uniformBuffer_, sizeof(ubo));
+		CopyBuffer(drawables_[0].GetUniformStagingBuffer(), drawables_[0].GetUniformBuffer(), sizeof(ubo));
 	}
 
 	void VulkanRenderer::DrawFrame() {
@@ -173,7 +166,6 @@ namespace Vulkan {
 
 	void VulkanRenderer::RecreateSwapChain() {
 		vkDeviceWaitIdle(device_);
-
 		CreateSwapChain();
 		CreateImageViews();
 		CreateRenderPass();
@@ -469,6 +461,19 @@ namespace Vulkan {
 		}
 	}
 
+	VulkanDrawable* VulkanRenderer::GetDrawable()
+	{
+		if (drawables_.size() == currentDrawable_)
+		{
+			drawables_.resize(currentDrawable_ + 1);
+		}
+		VulkanDrawable* drawable = &drawables_[currentDrawable_];
+		currentDrawable_++;
+
+		drawable->SetRenderDevice(this);
+		return drawable;
+	}
+
 	void VulkanRenderer::CreateCommandBuffers() {
 		if (cmdBuffers_.size() > 0) {
 			vkFreeCommandBuffers(device_, cmdPool_, static_cast<uint32_t>(cmdBuffers_.size()), cmdBuffers_.data());
@@ -525,7 +530,7 @@ namespace Vulkan {
 
 			vkCmdSetScissor(cmdBuffers_[i], 0, 1, &scissor);
 
-			for (VulkanDrawable& drawable : drawbles_) {
+			for (VulkanDrawable& drawable : drawables_) {
 				drawable.RecordDrawCommand(cmdBuffers_[i]);
 			}
 

@@ -3,6 +3,7 @@
 
 namespace Vulkan {
 	VulkanVertexBuffer::VulkanVertexBuffer() : pRenderer_(nullptr) {}
+	VulkanVertexBuffer::~VulkanVertexBuffer() {}
 
 	void VulkanVertexBuffer::SetRenderer(VulkanRenderer* renderer) {
 		pRenderer_ = renderer;
@@ -21,7 +22,6 @@ namespace Vulkan {
 
 	void VulkanVertexBuffer::CreateVertexBuffer(const std::vector<VertexPTN>& vertices) {
 		VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
-
 		VkCom<VkBuffer> stagingBuffer{ pRenderer_->device_, vkDestroyBuffer };
 		VkCom<VkDeviceMemory> stagingBufferMemory{ pRenderer_->device_, vkFreeMemory };
 		pRenderer_->CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
@@ -37,7 +37,6 @@ namespace Vulkan {
 
 	void VulkanVertexBuffer::CreateIndexBuffer(const std::vector<uint32_t>& indices) {
 		VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
-
 		VkCom<VkBuffer> stagingBuffer{ pRenderer_->device_, vkDestroyBuffer };
 		VkCom<VkDeviceMemory> stagingBufferMemory{ pRenderer_->device_, vkFreeMemory };
 		pRenderer_->CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
@@ -48,7 +47,6 @@ namespace Vulkan {
 		vkUnmapMemory(pRenderer_->device_, stagingBufferMemory);
 
 		pRenderer_->CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer_, indexBufferMemory_);
-
 		pRenderer_->CopyBuffer(stagingBuffer, indexBuffer_, bufferSize);
 	}
 }

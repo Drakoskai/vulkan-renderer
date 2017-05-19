@@ -3,25 +3,30 @@
 
 #include <vulkan/vulkan.h>
 #include "VkCom.h"
-#include "Material.h"
 #include "VulkanShader.h"
 
 namespace Vulkan {
-	struct VulkanVertexBuffer;
+	class VulkanVertexBuffer;
 	class VulkanDrawable;
 	class VulkanRenderer;
 
-	struct VulkanPipeline {
-		VulkanRenderer* pRenderer;
-		VkCom<VkDescriptorSetLayout> descriptorSetLayout;
-		VkCom<VkPipelineLayout> pipelineLayout;
-		VkCom<VkPipeline> pipeline;
+	class VulkanPipeline {
+	public:
+		uint64_t static PipelineHash() { return 0L; }
 		VulkanPipeline();
 		VulkanPipeline(VulkanRenderer* renderer);
+		~VulkanPipeline();
 		void SetRenderDevice(VulkanRenderer* renderer);
 		void CreatePipeline(const VulkanVertexBuffer& vertexBuffer, const ShaderId shaderid);
+		const VkCom<VkPipeline>& GetPipeline() const { return pipeline_; }
+		const VkCom<VkPipelineLayout>& GetPipelineLayout() const { return pipelineLayout_; }
+		const VkCom<VkDescriptorSetLayout>& GetDescriptorSetLayout() const { return descriptorSetLayout_; }
+	private:
 		void CreateDescriptorSetLayout();
-		uint64_t PipelineHash() { return 0L; }
+		VulkanRenderer* pRenderer_;
+		VkCom<VkDescriptorSetLayout> descriptorSetLayout_;
+		VkCom<VkPipelineLayout> pipelineLayout_;
+		VkCom<VkPipeline> pipeline_;
 	};
 }
 #endif

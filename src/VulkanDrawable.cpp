@@ -4,15 +4,15 @@
 
 namespace Vulkan {
 
-	VulkanDrawable::VulkanDrawable() : pPipeline_(nullptr), pRenderer_(nullptr), numIndices_(0) {}
+	VulkanDrawable::VulkanDrawable() : numIndices_(0), pPipeline_(nullptr), pRenderer_(nullptr) {}
 
-	VulkanDrawable::VulkanDrawable(VulkanRenderer* renderer) : pPipeline_(nullptr), pRenderer_(renderer), numIndices_(0) {
+	VulkanDrawable::VulkanDrawable(VulkanRenderer* renderer) : numIndices_(0), pPipeline_(nullptr), pRenderer_(renderer) {
 		vertexBuffer_.SetRenderer(pRenderer_);
 		uniformStagingBuffer_ = { pRenderer_->device_, vkDestroyBuffer };
 		uniformStagingBufferMemory_ = { pRenderer_->device_, vkFreeMemory };
 		uniformBuffer_ = { pRenderer_->device_, vkDestroyBuffer };
 		uniformBufferMemory_ = { pRenderer_->device_, vkFreeMemory };
-		descriptorPool_ = { pRenderer_->device_, vkDestroyDescriptorPool };	
+		descriptorPool_ = { pRenderer_->device_, vkDestroyDescriptorPool };
 	}
 
 	VulkanDrawable::~VulkanDrawable() {}
@@ -20,10 +20,11 @@ namespace Vulkan {
 	void VulkanDrawable::SetRenderDevice(VulkanRenderer* renderer) {
 		pRenderer_ = renderer;
 		vertexBuffer_.SetRenderer(pRenderer_);
+		uniformStagingBuffer_ = { pRenderer_->device_, vkDestroyBuffer };
 		uniformStagingBufferMemory_ = { pRenderer_->device_, vkFreeMemory };
 		uniformBuffer_ = { pRenderer_->device_, vkDestroyBuffer };
 		uniformBufferMemory_ = { pRenderer_->device_, vkFreeMemory };
-		descriptorPool_ = { pRenderer_->device_, vkDestroyDescriptorPool };	
+		descriptorPool_ = { pRenderer_->device_, vkDestroyDescriptorPool };
 	}
 
 	void VulkanDrawable::Generate(const std::vector<VertexPTN>& vertices, const std::vector<uint32_t>& indices, const Material& material) {
@@ -34,7 +35,6 @@ namespace Vulkan {
 		numIndices_ = static_cast<uint32_t>(indices.size());
 		vertexBuffer_.Generate(vertices, indices);
 		pPipeline_ = pRenderer_->GetPipeline(0L);
-
 		pPipeline_->CreatePipeline(vertexBuffer_, material.shader);
 
 		CreateUniformBuffer();
@@ -45,14 +45,14 @@ namespace Vulkan {
 	void VulkanDrawable::RecordDrawCommand(const VkCommandBuffer& commandBuffer) const {
 		if (numIndices_ == 0 || !pPipeline_) { return; }
 
-		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline_->pipeline);
+		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline_->GetPipeline());
 
-		VkBuffer vertexBuffers[] = { vertexBuffer_.vertexBuffer_ };
+		VkBuffer vertexBuffers[] = { vertexBuffer_.GetVertexBuffer() };
 		VkDeviceSize offsets[] = { 0 };
 
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-		vkCmdBindIndexBuffer(commandBuffer, vertexBuffer_.indexBuffer_, 0, VK_INDEX_TYPE_UINT32);
-		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline_->pipelineLayout, 0, 1, &descriptorSet_, 0, nullptr);
+		vkCmdBindIndexBuffer(commandBuffer, vertexBuffer_.GetIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline_->GetPipelineLayout(), 0, 1, &descriptorSet_, 0, nullptr);
 		vkCmdDrawIndexed(commandBuffer, numIndices_, 1, 0, 0, 0);
 	}
 
@@ -82,7 +82,7 @@ namespace Vulkan {
 	}
 
 	void VulkanDrawable::CreateDescriptorSet() {
-		VkDescriptorSetLayout layouts[] = { pPipeline_->descriptorSetLayout };
+		VkDescriptorSetLayout layouts[] = { pPipeline_->GetDescriptorSetLayout() };
 		VkDescriptorSetAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		allocInfo.descriptorPool = descriptorPool_;
