@@ -4,7 +4,7 @@
 
 namespace Vulkan {
 
-	VulkanDrawable::VulkanDrawable() : pRenderer(nullptr), mNumIndices(0) {}
+	VulkanDrawable::VulkanDrawable() : pPipeline(nullptr), pRenderer(nullptr), mNumIndices(0) {}
 
 	VulkanDrawable::VulkanDrawable(VulkanRenderer* renderer) : pPipeline(nullptr), pRenderer(renderer), mNumIndices(0) {
 		vertexBuffer = { pRenderer->device_, vkDestroyBuffer };
@@ -17,7 +17,6 @@ namespace Vulkan {
 		uniformBufferMemory = { pRenderer->device_, vkFreeMemory };
 		descriptorPool = { pRenderer->device_, vkDestroyDescriptorPool };
 		descriptorSetLayout = { pRenderer->device_, vkDestroyDescriptorSetLayout };
-		pPipeline = { pRenderer->device_, vkDestroyPipeline };
 	}
 
 	VulkanDrawable::~VulkanDrawable() {}
@@ -34,7 +33,6 @@ namespace Vulkan {
 		uniformBufferMemory = { pRenderer->device_, vkFreeMemory };
 		descriptorPool = { pRenderer->device_, vkDestroyDescriptorPool };
 		descriptorSetLayout = { pRenderer->device_, vkDestroyDescriptorSetLayout };
-		pPipeline = { pRenderer->device_, vkDestroyPipeline };
 	}
 
 	void VulkanDrawable::Generate(const std::vector<VertexPTN>& vertices, const std::vector<uint32_t>& indices, const Material& material) {
@@ -42,16 +40,18 @@ namespace Vulkan {
 			throw std::runtime_error("Vulkan Drawable not intialized!");
 		}
 
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions = vertices[0].GetAttributeDescriptions();
+		std::vector<VkVertexInputBindingDescription> bindingDescriptions{ vertices[0].GetBindingDescription() };
+
 		mNumIndices = static_cast<uint32_t>(indices.size());
 		CreateVertexBuffer(vertices);
 		CreateIndexBuffer(indices);
 		CreateDescriptorSetLayout();
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions = vertices[0].GetAttributeDescriptions();
 
-		std::vector<VkVertexInputBindingDescription> bindingDescriptions{ vertices[0].GetBindingDescription() };
 		std::vector<VkDescriptorSetLayout> layouts = { descriptorSetLayout };
+		pPipeline = pRenderer->GetPipeline(0L);
+		pPipeline->CreatePipeline(attributeDescriptions, bindingDescriptions, layouts, material.shader);
 
-		pRenderer->pipeline.CreatePipeline(pPipeline, attributeDescriptions, bindingDescriptions, layouts, material.shader);
 		CreateUniformBuffer();
 		CreateDescriptorPool();
 		CreateDescriptorSet(material);
@@ -60,7 +60,7 @@ namespace Vulkan {
 	void VulkanDrawable::RecordDrawCommand(const VkCommandBuffer& commandBuffer) const {
 		if (mNumIndices == 0 || !pPipeline) { return; }
 
-		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline);
+		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline->pipeline);
 
 		VkBuffer vertexBuffers[] = { vertexBuffer };
 		VkDeviceSize offsets[] = { 0 };
@@ -69,7 +69,7 @@ namespace Vulkan {
 
 		vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
-		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pRenderer->pipeline.pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
+		vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline->pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
 
 		vkCmdDrawIndexed(commandBuffer, mNumIndices, 1, 0, 0, 0);
 	}

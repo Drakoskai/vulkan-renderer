@@ -37,9 +37,9 @@ namespace Vulkan {
 
 		VkCom<VkDescriptorPool> descriptorPool;		
 		VkCom<VkDescriptorSetLayout> descriptorSetLayout;
+
 		VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
-		//VulkanPipeline* pPipeline;
-		VkCom<VkPipeline> pPipeline;
+		VulkanPipeline* pPipeline;
 		VulkanRenderer* pRenderer;
 		
 	private:

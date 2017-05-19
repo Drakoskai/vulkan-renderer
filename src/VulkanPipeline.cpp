@@ -7,14 +7,16 @@ namespace Vulkan {
 
 	VulkanPipeline::VulkanPipeline(VulkanRenderer* renderer) : pRenderer(renderer) {
 		pipelineLayout = { pRenderer->device_, vkDestroyPipelineLayout };
+		pipeline = { pRenderer->device_, vkDestroyPipeline };
 	}
 
 	void VulkanPipeline::SetRenderDevice(VulkanRenderer* renderer) {
 		pRenderer = renderer;
 		pipelineLayout = { pRenderer->device_, vkDestroyPipelineLayout };
+		pipeline = { pRenderer->device_, vkDestroyPipeline };
 	}
 
-	void VulkanPipeline::CreatePipeline(VkCom<VkPipeline>& pipeline, const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions, const std::vector<VkVertexInputBindingDescription>& bindingDescriptions, const std::vector<VkDescriptorSetLayout>& layouts, const ShaderId shaderid) {
+	void VulkanPipeline::CreatePipeline(const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions, const std::vector<VkVertexInputBindingDescription>& bindingDescriptions, const std::vector<VkDescriptorSetLayout>& layouts, const ShaderId shaderid) {
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 

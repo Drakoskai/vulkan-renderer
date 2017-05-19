@@ -28,9 +28,6 @@ namespace Vulkan {
 		CreateCommandPool();
 		CreateDepthResources();
 		CreateFramebuffers();
-
-		pipeline.SetRenderDevice(this);
-
 		CreateCommandBuffers();
 		CreateSemaphores();
 	}
@@ -78,7 +75,6 @@ namespace Vulkan {
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
 		submitInfo.pWaitDstStageMask = waitStages;
-
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = &cmdBuffers_[imageIndex];
 
@@ -92,14 +88,12 @@ namespace Vulkan {
 
 		VkPresentInfoKHR presentInfo = {};
 		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-
 		presentInfo.waitSemaphoreCount = 1;
 		presentInfo.pWaitSemaphores = signalSemaphores;
 
 		VkSwapchainKHR swapChains[] = { swapChain_ };
 		presentInfo.swapchainCount = 1;
 		presentInfo.pSwapchains = swapChains;
-
 		presentInfo.pImageIndices = &imageIndex;
 
 		result = vkQueuePresentKHR(presentQueue_, &presentInfo);
@@ -133,6 +127,15 @@ namespace Vulkan {
 			textures_[textureid].Generate();
 		}
 		return &textures_[textureid];
+	}
+
+	VulkanPipeline* VulkanRenderer::GetPipeline(uint64_t pipelinehash) {
+		if (pipelines_.find(pipelinehash) == end(pipelines_)) {
+			VulkanPipeline pipeline;
+			pipelines_[pipelinehash] = pipeline;
+			pipelines_[pipelinehash].SetRenderDevice(this);
+		}
+		return &pipelines_[pipelinehash];
 	}
 
 	VkCommandBuffer VulkanRenderer::BeginCommandBuffer() const {

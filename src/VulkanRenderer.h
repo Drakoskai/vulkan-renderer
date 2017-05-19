@@ -83,6 +83,7 @@ namespace Vulkan {
 		void EndFrame() override;
 		VulkanShader* GetShader(ShaderId shaderid);
 		VulkanTexture* GetTexture(TextureId textureid);
+		VulkanPipeline* GetPipeline(uint64_t pipelinehash);
 		VkCommandBuffer BeginCommandBuffer() const;
 		void EndCommandBuffer(VkCommandBuffer commandBuffer) const;
 
@@ -98,6 +99,7 @@ namespace Vulkan {
 		void CreateCommandPool();
 		void CreateDepthResources();
 		void CreateFramebuffers();
+
 		VulkanDrawable* GetDrawable() {
 			if (drawbles_.size() == currentDrawable_) {
 				drawbles_.resize(currentDrawable_ + 1);
@@ -152,7 +154,6 @@ namespace Vulkan {
 		VkExtent2D swapChainExtent_;
 		VkCom<VkCommandPool> cmdPool_{ device_, vkDestroyCommandPool };
 		VkCom<VkRenderPass> renderPass_{ device_, vkDestroyRenderPass };
-		VulkanPipeline pipeline;
 		//framebuffer
 		VkCom<VkImage> depthImage_{ device_, vkDestroyImage };
 		VkCom<VkDeviceMemory> depthImageMemory_{ device_, vkFreeMemory };
