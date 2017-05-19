@@ -1,6 +1,7 @@
 #include "VulkanPipeline.h"
 #include "VulkanRenderer.h"
 #include "VulkanDrawable.h"
+#include "VulkanVertexBuffer.h"
 
 namespace Vulkan {
 	VulkanPipeline::VulkanPipeline() : pRenderer(nullptr) {}
@@ -44,15 +45,18 @@ namespace Vulkan {
 		}
 	}
 
-	void VulkanPipeline::CreatePipeline(const VertexBufferInfo& vertexInfo, const ShaderId shaderid) {
+	void VulkanPipeline::CreatePipeline(const VulkanVertexBuffer& vertexBuffer, const ShaderId shaderid) {
 		CreateDescriptorSetLayout();
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(vertexInfo.bindingDescriptions.size());
-		vertexInputInfo.pVertexBindingDescriptions = vertexInfo.bindingDescriptions.data();
-		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexInfo.attributeDescriptions.size());
-		vertexInputInfo.pVertexAttributeDescriptions = vertexInfo.attributeDescriptions.data();
+		auto bindingDescriptions = vertexBuffer.bindingDescriptions_;
+		auto attributeDescriptions = vertexBuffer.attributeDescriptions_;
+
+		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
+		vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+		vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 		VkPipelineInputAssemblyStateCreateInfo inputAssembly = {};
 		inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;

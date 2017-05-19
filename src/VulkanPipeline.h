@@ -7,13 +7,9 @@
 #include "VulkanShader.h"
 
 namespace Vulkan {
+	struct VulkanVertexBuffer;
 	class VulkanDrawable;
 	class VulkanRenderer;
-
-	struct VertexBufferInfo {
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
-		std::vector<VkVertexInputBindingDescription> bindingDescriptions;
-	};
 
 	struct VulkanPipeline {
 		VulkanRenderer* pRenderer;
@@ -23,8 +19,9 @@ namespace Vulkan {
 		VulkanPipeline();
 		VulkanPipeline(VulkanRenderer* renderer);
 		void SetRenderDevice(VulkanRenderer* renderer);
-		void CreatePipeline(const VertexBufferInfo& vertexInfo, const ShaderId shaderid);
+		void CreatePipeline(const VulkanVertexBuffer& vertexBuffer, const ShaderId shaderid);
 		void CreateDescriptorSetLayout();
+		uint64_t PipelineHash() { return 0L; }
 	};
 }
 #endif

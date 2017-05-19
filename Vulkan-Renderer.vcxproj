@@ -173,6 +173,7 @@
     <ClCompile Include="src\VulkanTexture.cpp" />
     <ClCompile Include="src\VulkanTypes.cpp" />
     <ClCompile Include="src\VulkanUtil.cpp" />
+    <ClCompile Include="src\VulkanVertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
@@ -203,6 +204,7 @@
     <ClInclude Include="src\VulkanTexture.h" />
     <ClInclude Include="src\VulkanTypes.h" />
     <ClInclude Include="src\VulkanUtil.h" />
+    <ClInclude Include="src\VulkanVertexBuffer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
