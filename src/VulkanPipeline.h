@@ -11,11 +11,12 @@ namespace Vulkan {
 
 	struct VulkanPipeline {
 		VulkanRenderer* pRenderer;
+		VkCom<VkPipeline> pPipeline;
 		VkCom<VkPipelineLayout> pipelineLayout;
 
 		VulkanPipeline();
 		VulkanPipeline(VulkanRenderer* renderer);
 		void SetRenderDevice(VulkanRenderer* renderer);
-		void CreatePipeline(VkCom<VkPipeline>& pipeline, VulkanDrawable* drawable, Material* material);
+		void CreatePipeline(VkCom<VkPipeline>& pipeline, const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions, const std::vector<VkVertexInputBindingDescription>& bindingDescription, const std::vector<VkDescriptorSetLayout>& layouts, const ShaderId shaderid);
 	};
 }

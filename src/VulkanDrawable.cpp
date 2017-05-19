@@ -34,9 +34,10 @@ namespace Vulkan {
 		uniformBufferMemory = { pRenderer->device, vkFreeMemory };
 		descriptorPool = { pRenderer->device, vkDestroyDescriptorPool };
 		descriptorSetLayout = { pRenderer->device, vkDestroyDescriptorSetLayout };
+		pPipeline = { pRenderer->device, vkDestroyPipeline };
 	}
 
-	void VulkanDrawable::Generate(const std::vector<VertexPTN>& vertices, const std::vector<uint32_t>& indices, Material* material) {
+	void VulkanDrawable::Generate(const std::vector<VertexPTN>& vertices, const std::vector<uint32_t>& indices, const Material& material) {
 		if (!pRenderer) {
 			throw std::runtime_error("Vulkan Drawable not intialized!");
 		}
@@ -45,7 +46,12 @@ namespace Vulkan {
 		CreateVertexBuffer(vertices);
 		CreateIndexBuffer(indices);
 		CreateDescriptorSetLayout();
-		pRenderer->pipeline.CreatePipeline(pPipeline, this, material);
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions = vertices[0].GetAttributeDescriptions();
+
+		std::vector<VkVertexInputBindingDescription> bindingDescriptions{ vertices[0].GetBindingDescription() };
+		std::vector<VkDescriptorSetLayout> layouts = { descriptorSetLayout };
+
+		pRenderer->pipeline.CreatePipeline(pPipeline, attributeDescriptions, bindingDescriptions, layouts, material.shader);
 		CreateUniformBuffer();
 		CreateDescriptorPool();
 		CreateDescriptorSet(material);
@@ -81,7 +87,6 @@ namespace Vulkan {
 		vkUnmapMemory(pRenderer->device, stagingBufferMemory);
 
 		pRenderer->CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
-
 		pRenderer->CopyBuffer(stagingBuffer, vertexBuffer, bufferSize);
 	}
 
@@ -153,7 +158,7 @@ namespace Vulkan {
 		}
 	}
 
-	void VulkanDrawable::CreateDescriptorSet(Material* material) {
+	void VulkanDrawable::CreateDescriptorSet(const Material& material) {
 		VkDescriptorSetLayout layouts[] = { descriptorSetLayout };
 		VkDescriptorSetAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -180,7 +185,7 @@ namespace Vulkan {
 		descriptorWrites[0].descriptorCount = 1;
 		descriptorWrites[0].pBufferInfo = &bufferInfo;
 
-		VulkanTexture* diffuseTexture = pRenderer->GetTexture(material->diffuseTexture);
+		VulkanTexture* diffuseTexture = pRenderer->GetTexture(material.diffuseTexture);
 		if (diffuseTexture) {
 			descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[1].dstSet = descriptorSet;

@@ -49,6 +49,7 @@ namespace FileFormats {
 
 				indices.push_back(uniqueVertices[vertex]);
 			}
+
 			auto& mat = materials[shape.mesh.material_ids[0]];
 			Material material = {};
 			material.name = mat.name;

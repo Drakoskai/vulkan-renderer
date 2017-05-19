@@ -16,14 +16,14 @@ namespace Vulkan {
 		VulkanDrawable(VulkanRenderer* renderer);
 		~VulkanDrawable();
 		void SetRenderDevice(VulkanRenderer* renderer);
-		void Generate(const std::vector<VertexPTN>& vertices, const std::vector<uint32_t>& indices, Material* material);
+		void Generate(const std::vector<VertexPTN>& vertices, const std::vector<uint32_t>& indices, const Material& material);
 		void RecordDrawCommand(const VkCommandBuffer& commandBuffer) const;
 		void CreateVertexBuffer(const std::vector<VertexPTN>& vertices);
 		void CreateIndexBuffer(const std::vector<uint32_t>& indices);
 		void CreateDescriptorSetLayout();
 		void CreateUniformBuffer();
 		void CreateDescriptorPool();
-		void CreateDescriptorSet(Material* material);
+		void CreateDescriptorSet(const Material& material);
 
 		VkCom<VkBuffer> vertexBuffer;
 		VkCom<VkDeviceMemory> vertexBufferMemory;
@@ -38,6 +38,7 @@ namespace Vulkan {
 		VkCom<VkDescriptorPool> descriptorPool;		
 		VkCom<VkDescriptorSetLayout> descriptorSetLayout;
 		VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
+		//VulkanPipeline* pPipeline;
 		VkCom<VkPipeline> pPipeline;
 		VulkanRenderer* pRenderer;
 		

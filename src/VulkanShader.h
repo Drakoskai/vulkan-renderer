@@ -16,7 +16,6 @@ namespace Vulkan
 		explicit VulkanShader(VulkanRenderer* pRenderer);
 		void SetRenderDevice(VulkanRenderer* renderer) { pRenderer = renderer; }
 		void LoadShaders(ShaderId shaderId);
-
 	};
 
 }

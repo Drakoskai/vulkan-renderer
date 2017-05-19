@@ -10,19 +10,26 @@ enum class VertexFormat {
 };
 
 struct Vertex {
-	virtual ~Vertex() { }
-	virtual VkVertexInputBindingDescription GetBindingDescription() = 0;
-	virtual std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions() = 0;
+	Vec3 position;
+	Vertex() {}
+	virtual ~Vertex() = default;
+	virtual VkVertexInputBindingDescription GetBindingDescription() const {
+		VkVertexInputBindingDescription empty{};
+		return empty;
+	}
+
+	virtual std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions() const = 0 {
+		std::vector<VkVertexInputAttributeDescription> empty{};
+		return empty;
+	}
 };
 
-struct VertexPTC {
-	Vec3 position;
+struct VertexPTC : Vertex {
 	Vec2 texCoord;
 	Vec4 color;
 
-	static VkVertexInputBindingDescription GetBindingDescription();
-
-	static std::array<VkVertexInputAttributeDescription, 3> GetAttributeDescriptions();
+	VkVertexInputBindingDescription GetBindingDescription() const override;
+	std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions()const override;
 
 	bool operator==(const VertexPTC& other) const;
 };
@@ -35,14 +42,12 @@ namespace std {
 	};
 }
 
-struct VertexPTN {
-	Vec3 position;
+struct VertexPTN : Vertex {
 	Vec2 texCoord;
 	Vec3 normal;
 
-	static VkVertexInputBindingDescription GetBindingDescription();
-
-	static std::array<VkVertexInputAttributeDescription, 3> GetAttributeDescriptions();
+	VkVertexInputBindingDescription GetBindingDescription() const override;
+	std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions() const override;
 
 	bool operator==(const VertexPTN& other) const;
 };
@@ -55,16 +60,14 @@ namespace std {
 	};
 }
 
-struct VertexPTNTC {
-	glm::vec3 position;
-	glm::vec2 texCoord;
-	glm::vec3 normal;
-	glm::vec4 tangent;
-	glm::vec4 color;
+struct VertexPTNTC : Vertex {
+	Vec2 texCoord;
+	Vec3 normal;
+	Vec4 tangent;
+	Vec4 color;
 
-	static VkVertexInputBindingDescription GetBindingDescription();
-
-	static std::array<VkVertexInputAttributeDescription, 4> GetAttributeDescriptions();
+	VkVertexInputBindingDescription GetBindingDescription() const override;
+	std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions() const override;
 	bool operator==(const VertexPTNTC& other) const;
 };
 

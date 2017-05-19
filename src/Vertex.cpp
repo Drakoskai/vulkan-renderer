@@ -1,6 +1,6 @@
 #include "Vertex.h"
 
-VkVertexInputBindingDescription VertexPTC::GetBindingDescription() {
+VkVertexInputBindingDescription VertexPTC::GetBindingDescription() const {
 	VkVertexInputBindingDescription bindingDescription = {
 		0,
 		sizeof(VertexPTC),
@@ -10,8 +10,8 @@ VkVertexInputBindingDescription VertexPTC::GetBindingDescription() {
 	return bindingDescription;
 }
 
-std::array<VkVertexInputAttributeDescription, 3> VertexPTC::GetAttributeDescriptions() {
-	std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions = { };
+std::vector<VkVertexInputAttributeDescription> VertexPTC::GetAttributeDescriptions() const {
+	std::vector<VkVertexInputAttributeDescription> attributeDescriptions = std::vector<VkVertexInputAttributeDescription>(3);
 
 	attributeDescriptions[0].binding = 0;
 	attributeDescriptions[0].location = 0;
@@ -35,7 +35,7 @@ bool VertexPTC::operator==(const VertexPTC& other) const {
 	return position == other.position && color == other.color && texCoord == other.texCoord;
 }
 
-VkVertexInputBindingDescription VertexPTN::GetBindingDescription() {
+VkVertexInputBindingDescription VertexPTN::GetBindingDescription() const {
 	VkVertexInputBindingDescription bindingDescription = {
 		0,
 		sizeof(VertexPTN),
@@ -45,8 +45,8 @@ VkVertexInputBindingDescription VertexPTN::GetBindingDescription() {
 	return bindingDescription;
 }
 
-std::array<VkVertexInputAttributeDescription, 3> VertexPTN::GetAttributeDescriptions() {
-	std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions = { };
+std::vector<VkVertexInputAttributeDescription> VertexPTN::GetAttributeDescriptions() const {
+	std::vector<VkVertexInputAttributeDescription> attributeDescriptions = std::vector<VkVertexInputAttributeDescription>(3);
 
 	attributeDescriptions[0].binding = 0;
 	attributeDescriptions[0].location = 0;
@@ -70,7 +70,7 @@ bool VertexPTN::operator==(const VertexPTN& other) const {
 	return position == other.position && normal == other.normal && texCoord == other.texCoord;
 }
 
-VkVertexInputBindingDescription VertexPTNTC::GetBindingDescription() {
+VkVertexInputBindingDescription VertexPTNTC::GetBindingDescription() const {
 	VkVertexInputBindingDescription bindingDescription = {
 		0,
 		sizeof(VertexPTNTC),
@@ -80,8 +80,8 @@ VkVertexInputBindingDescription VertexPTNTC::GetBindingDescription() {
 	return bindingDescription;
 }
 
-std::array<VkVertexInputAttributeDescription, 4> VertexPTNTC::GetAttributeDescriptions() {
-	std::array<VkVertexInputAttributeDescription, 4> attributeDescriptions = { };
+std::vector<VkVertexInputAttributeDescription> VertexPTNTC::GetAttributeDescriptions() const {
+	std::vector<VkVertexInputAttributeDescription> attributeDescriptions = std::vector<VkVertexInputAttributeDescription>(5);
 
 	attributeDescriptions[0].binding = 0;
 	attributeDescriptions[0].location = 0;
