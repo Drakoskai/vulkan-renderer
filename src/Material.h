@@ -10,7 +10,7 @@ struct Material {
 	Vec3 diffuse;
 	Vec3 emissive;
 	Vec3 specular;
-	uint32_t shininess;
+	float shininess;
 	float alpha;
 	TextureId diffuseTexture;
 	ShaderId shader;

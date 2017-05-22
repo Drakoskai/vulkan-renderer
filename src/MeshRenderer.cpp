@@ -5,6 +5,10 @@
 
 GameObject* MeshRenderer::GetGameObject() const { return pObj_; }
 
+ComponentFactory<MeshRenderer>& MeshRenderer::GetMeshRenderers() {
+	return Components::MeshRendererComponents;
+}
+
 void MeshRenderer::SetMaterial(Material* material, uint32_t subMeshIndex) {
 	if (subMeshIndex >= 0 && subMeshIndex < uint32_t(materials_.size())) {
 		materials_[subMeshIndex] = material;

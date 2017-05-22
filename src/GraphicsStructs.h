@@ -9,7 +9,7 @@ public:
 	virtual ~IRenderer() {}
 	virtual void Init() = 0;
 	virtual void PrepareFrame() = 0;
-	virtual void DrawFrame() = 0;
+	virtual void PresentFrame() = 0;
 	virtual void EndFrame() = 0;
 	virtual void InitMesh(Mesh* mesh) = 0;
 };

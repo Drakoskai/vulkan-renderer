@@ -18,16 +18,16 @@ void Transform::LookAt(const Vec3& localPosition, const Vec3& center, const Vec3
 void Transform::SetParent(Transform* parent) {
 	using namespace Components;
 	const Transform* comp = parent;
-	while(comp != nullptr) {
-		if(comp == this) {
+	while (comp != nullptr) {
+		if (comp == this) {
 			return;
 		}
 
 		comp = comp->parent_ == -1 ? nullptr : &TransformComponents[comp->parent_];
 	}
 
-	for(uint32_t componentIndex = 0; componentIndex < TransformComponents.size(); ++componentIndex) {
-		if(&TransformComponents[componentIndex] == parent) {
+	for (uint32_t componentIndex = 0; componentIndex < TransformComponents.size(); ++componentIndex) {
+		if (&TransformComponents[componentIndex] == parent) {
 			parent_ = static_cast<int>(componentIndex);
 			return;
 		}
@@ -54,22 +54,26 @@ Vec3 Transform::GetRight() const {
 	return right;
 }
 
+const ComponentFactory<Transform>& Transform::GetTransforms() {
+	return Components::TransformComponents;
+}
+
 void Transform::UpdateLocalMatrices() {
 	using namespace Components;
 
 	uint32_t nextFreeTransformComponent = TransformComponents.GetNextFreeIndex();
 
-	for(uint32_t componentIndex = 0; componentIndex < nextFreeTransformComponent; ++componentIndex) {
+	for (uint32_t componentIndex = 0; componentIndex < nextFreeTransformComponent; ++componentIndex) {
 		TransformComponents[componentIndex].SolveLocalMatrix();
 	}
 
-	for(uint32_t componentIndex = 0; componentIndex < nextFreeTransformComponent; ++componentIndex) {
+	for (uint32_t componentIndex = 0; componentIndex < nextFreeTransformComponent; ++componentIndex) {
 		int parent = TransformComponents[componentIndex].parent_;
 		Matrix transform = TransformComponents[componentIndex].model_;
 		Quaternion worldRotation = TransformComponents[componentIndex].rot_;
 		Vec3 worldPosition = TransformComponents[componentIndex].pos_;
 
-		while(parent != -1) {
+		while (parent != -1) {
 			transform = TransformComponents[parent].GetModel() * transform;
 			worldRotation = worldRotation * TransformComponents[parent].rot_;
 			worldPosition = worldPosition * TransformComponents[parent].pos_;
@@ -81,9 +85,9 @@ void Transform::UpdateLocalMatrices() {
 		TransformComponents[componentIndex].worldPos_ = worldPosition;
 		TransformComponents[componentIndex].worldRot_ = worldRotation;
 
-		if(TransformComponents[componentIndex].pObj_) {
+		if (TransformComponents[componentIndex].pObj_) {
 			Camera* camera = TransformComponents[componentIndex].pObj_->GetComponent<Camera>();
-			if(camera) {
+			if (camera) {
 				Transform& trans = TransformComponents[componentIndex];
 				Vec3 eye = trans.worldPos_;
 				Vec3 center = trans.GetForward();

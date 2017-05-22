@@ -3,12 +3,15 @@
 #include "VulkanTypes.h"
 #include <chrono>
 #include "ObjFileLoader.h"
+#include "Transform.h"
+#include "Camera.h"
+#include "MeshRenderer.h"
 
 namespace Vulkan {
 
 	VulkanRenderer::VulkanRenderer(GLFWwindow* window) : pWnd_(window), graphicsQueue_(nullptr), presentQueue_(nullptr), swapChainImageFormat_() {}
 
-	VulkanRenderer::~VulkanRenderer() {	vkDeviceWaitIdle(device_); }
+	VulkanRenderer::~VulkanRenderer() { vkDeviceWaitIdle(device_); }
 
 	void VulkanRenderer::Init() {
 		CreateInstance();
@@ -27,19 +30,22 @@ namespace Vulkan {
 	}
 
 	void VulkanRenderer::PrepareFrame() {
-		static auto startTime = std::chrono::high_resolution_clock::now();
-		auto currentTime = std::chrono::high_resolution_clock::now();
-		float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
+		Transform::UpdateLocalMatrices();
+		Camera::GetCameras()[0].SetProjection(glm::perspective(glm::radians(45.0f), swapChainExtent_.width / static_cast<float>(swapChainExtent_.height), 0.1f, 10.0f));
 
 		UniformBufferObject ubo;
-		Matrix model = rotate(glm::mat4(), time * glm::radians(90.0f), Vec3(0.0f, 0.0f, 1.0f));
-		Matrix view = lookAt(Vec3(2.0f, 2.0f, 2.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f));
-		Matrix proj = glm::perspective(glm::radians(45.0f), swapChainExtent_.width / static_cast<float>(swapChainExtent_.height), 0.1f, 10.0f);
+		Matrix model = Transform::GetTransforms()[0].GetModelToWorldMatrix();
+		Matrix view = Camera::GetCameras()[0].GetView();
+		Matrix proj = Camera::GetCameras()[0].GetProj();
 		proj[1][1] *= -1;
 
 		void* data;
-		ubo.mvp = proj * view * model;
-		ubo.world = Matrix();
+		ubo.model = model;
+		ubo.view = view;
+		ubo.proj = proj;
+		ubo.world = Matrix(1.0);
+		ubo.lightpos = Vec3(2.0f, 2.0f, 8.0f);
+
 		vkMapMemory(device_, drawables_[0].GetUniformStagingMemory(), 0, sizeof(ubo), 0, &data);
 		memcpy(data, &ubo, sizeof(ubo));
 		vkUnmapMemory(device_, drawables_[0].GetUniformStagingMemory());
@@ -47,7 +53,7 @@ namespace Vulkan {
 		CopyBuffer(drawables_[0].GetUniformStagingBuffer(), drawables_[0].GetUniformBuffer(), sizeof(ubo));
 	}
 
-	void VulkanRenderer::DrawFrame() {
+	void VulkanRenderer::PresentFrame() {
 		uint32_t imageIndex;
 		VkResult result = vkAcquireNextImageKHR(device_, swapChain_, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphore_, VK_NULL_HANDLE, &imageIndex);
 
@@ -59,7 +65,6 @@ namespace Vulkan {
 		if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
 			throw std::runtime_error("failed to acquire swap chain image!");
 		}
-
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
@@ -181,9 +186,9 @@ namespace Vulkan {
 
 		VkApplicationInfo appInfo = {};
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-		appInfo.pApplicationName = "Hello Triangle";
+		appInfo.pApplicationName = "Engine Test";
 		appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-		appInfo.pEngineName = "No Engine";
+		appInfo.pEngineName = "Kai Engine";
 		appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 		appInfo.apiVersion = VK_API_VERSION_1_0;
 
@@ -269,12 +274,9 @@ namespace Vulkan {
 
 		VkDeviceCreateInfo createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-
 		createInfo.pQueueCreateInfos = queueCreateInfos.data();
 		createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
-
 		createInfo.pEnabledFeatures = &deviceFeatures;
-
 		createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 		createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
@@ -418,7 +420,6 @@ namespace Vulkan {
 
 	void VulkanRenderer::CreateCommandPool() {
 		QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(physicalDevice_);
-
 		VkCommandPoolCreateInfo poolInfo = {};
 		poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily;
@@ -430,16 +431,13 @@ namespace Vulkan {
 
 	void VulkanRenderer::CreateDepthResources() {
 		VkFormat depthFormat = FindDepthFormat();
-
 		CreateImage(swapChainExtent_.width, swapChainExtent_.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage_, depthImageMemory_);
 		CreateImageView(depthImage_, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, depthImageView_);
-
 		TransitionImageLayout(depthImage_, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 	}
 
 	void VulkanRenderer::CreateFramebuffers() {
 		swapChainFramebuffers_.resize(swapChainImageViews_.size(), VkCom<VkFramebuffer>{device_, vkDestroyFramebuffer});
-
 		for (size_t i = 0; i < swapChainImageViews_.size(); i++) {
 			std::array<VkImageView, 2> attachments = {
 				swapChainImageViews_[i],
@@ -454,17 +452,14 @@ namespace Vulkan {
 			framebufferInfo.width = swapChainExtent_.width;
 			framebufferInfo.height = swapChainExtent_.height;
 			framebufferInfo.layers = 1;
-
 			if (vkCreateFramebuffer(device_, &framebufferInfo, nullptr, swapChainFramebuffers_[i].replace()) != VK_SUCCESS) {
 				throw std::runtime_error("failed to create framebuffer!");
 			}
 		}
 	}
 
-	VulkanDrawable* VulkanRenderer::GetDrawable()
-	{
-		if (drawables_.size() == currentDrawable_)
-		{
+	VulkanDrawable* VulkanRenderer::GetDrawable() {
+		if (drawables_.size() == currentDrawable_) {
 			drawables_.resize(currentDrawable_ + 1);
 		}
 		VulkanDrawable* drawable = &drawables_[currentDrawable_];
@@ -480,13 +475,11 @@ namespace Vulkan {
 		}
 
 		cmdBuffers_.resize(swapChainFramebuffers_.size());
-
 		VkCommandBufferAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocInfo.commandPool = cmdPool_;
 		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 		allocInfo.commandBufferCount = static_cast<uint32_t>(cmdBuffers_.size());
-
 		if (vkAllocateCommandBuffers(device_, &allocInfo, cmdBuffers_.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate command buffers!");
 		}

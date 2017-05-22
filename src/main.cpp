@@ -7,6 +7,7 @@
 #include "Scene.h"
 #include "Transform.h"
 #include "MeshRenderer.h"
+#include "Camera.h"
 const int WIDTH = 800;
 const int HEIGHT = 600;
 
@@ -30,6 +31,12 @@ public:
 		IRenderer* renderer = new Vulkan::VulkanRenderer(window);
 		Scene* scene = new Scene(renderer);
 
+		GameObject* mainCamera = new GameObject();
+		mainCamera->AddComponent<Camera>();
+
+		Camera* cam = mainCamera->GetComponent<Camera>();
+		cam->SetView(lookAt(Vec3(2.0f, 2.0f, 2.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f)));
+
 		GameObject* cube = new GameObject();
 		cube->AddComponent<Transform>();
 		cube->AddComponent<MeshRenderer>();
@@ -39,14 +46,21 @@ public:
 		mesh->LoadFromFile(CUBE_MODEL_PATH, CUBE_MODEL_NAME);
 		MeshRenderer* cubeRenderer = cube->GetComponent<MeshRenderer>();
 		cubeRenderer->SetMesh(mesh);
-		Transform* cubeTransform = cube->GetComponent<Transform>();
+		
 
 		scene->Add(cube);
 
 		while(!glfwWindowShouldClose(window)) {
 			glfwPollEvents();	
-			renderer->PrepareFrame();
-			renderer->DrawFrame();
+			static auto startTime = std::chrono::high_resolution_clock::now();
+			auto currentTime = std::chrono::high_resolution_clock::now();
+			float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
+
+			Transform* cubeTransform = cube->GetComponent<Transform>();
+
+			cubeTransform->SetRotation(rotate(glm::quat(), time * glm::radians(90.0f), Vec3(0.0f, 0.0f, 1.0f)));			
+			//renderer->PrepareFrame();
+			renderer->PresentFrame();
 		}
 
 		SafeDelete(scene);

@@ -14,6 +14,7 @@ namespace Vulkan {
 class MeshRenderer {
 public:
 	class GameObject* GetGameObject() const;
+	static ComponentFactory<MeshRenderer>& GetMeshRenderers();
 	MeshRenderer() = default;
 	void SetMaterial(Material* material, uint32_t subMeshIndex);
 	void SetMesh(Mesh* mesh);

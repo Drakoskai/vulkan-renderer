@@ -8,6 +8,7 @@ class Camera {
 public:
 	enum class ProjectionType { Orthographic, Perspective };
 
+	static ComponentFactory<Camera>& GetCameras();
 	void SetViewPort(int x, int y, int width, int height);
 	void SetProjection(float left, float right, float bottom, float top, float n, float f);
 	void SetProjection(float fovDegrees, float aspect, float n, float f);

@@ -79,7 +79,7 @@ namespace Vulkan {
 
 		void Init() override;
 		void PrepareFrame() override;
-		void DrawFrame() override;
+		void PresentFrame() override;
 		void EndFrame() override;
 		VulkanDrawable* GetDrawable();
 		VulkanShader* GetShader(ShaderId shaderid);
@@ -130,7 +130,6 @@ namespace Vulkan {
 		VkCom<VkInstance> instance_{ vkDestroyInstance };
 		VkCom<VkDebugReportCallbackEXT> callback_{ instance_, DestroyDebugReportCallbackEXT };
 		VkCom<VkSurfaceKHR> surface{ instance_, vkDestroySurfaceKHR };
-
 		VkPhysicalDevice physicalDevice_ = nullptr;
 		VkCom<VkDevice> device_{ vkDestroyDevice };
 
@@ -138,12 +137,11 @@ namespace Vulkan {
 		VkQueue presentQueue_;
 
 		VkCom<VkSwapchainKHR> swapChain_{ device_, vkDestroySwapchainKHR };
-		std::vector<VkImage> swapChainImages_;
 		VkFormat swapChainImageFormat_;
 		VkExtent2D swapChainExtent_;
 		VkCom<VkCommandPool> cmdPool_{ device_, vkDestroyCommandPool };
 		VkCom<VkRenderPass> renderPass_{ device_, vkDestroyRenderPass };
-		//framebuffer
+
 		VkCom<VkImage> depthImage_{ device_, vkDestroyImage };
 		VkCom<VkDeviceMemory> depthImageMemory_{ device_, vkFreeMemory };
 		VkCom<VkImageView> depthImageView_{ device_, vkDestroyImageView };
@@ -153,12 +151,12 @@ namespace Vulkan {
 		uint32_t currentDrawable_ = 0;
 		std::vector<VulkanDrawable> drawables_;
 		std::vector<VkCommandBuffer> cmdBuffers_;
+		std::vector<VkImage> swapChainImages_;
 		std::vector<VkCom<VkImageView>> swapChainImageViews_;
 		std::vector<VkCom<VkFramebuffer>> swapChainFramebuffers_;
 		std::unordered_map<ShaderId, VulkanShader> shadercache_;
 		std::unordered_map<TextureId, VulkanTexture> textures_;
 		std::unordered_map<uint64_t, VulkanPipeline> pipelines_;
-
 	};
 }
 #endif

@@ -29,16 +29,19 @@ namespace Vulkan {
 	};
 
 	struct UniformBufferObject {
-		Matrix mvp;
+		Matrix model;
+		Matrix view;
+		Matrix proj;
 		Matrix world;
+		Vec3 lightpos;
 	};
 
 	struct VkTextureFilter {
 		const TextureFilter& mTextureFilter;
-		VkTextureFilter(const TextureFilter& textureFilter) : mTextureFilter(textureFilter) { }
+		VkTextureFilter(const TextureFilter& textureFilter) : mTextureFilter(textureFilter) {}
 
 		operator VkSamplerMipmapMode() const {
-			switch(mTextureFilter) {
+			switch (mTextureFilter) {
 			case TextureFilter::Nearest:
 				return VK_SAMPLER_MIPMAP_MODE_NEAREST;
 			case TextureFilter::Linear:

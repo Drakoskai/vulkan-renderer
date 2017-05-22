@@ -9,6 +9,4 @@ namespace Vulkan {
 #define DEFAULT_FENCE_TIMEOUT 100000000000
 
 	std::string VkResultToString(VkResult result);
-
-
 }

@@ -14,10 +14,10 @@ layout(binding = 0) uniform UniformBufferObject {
 } ubo;
 
 layout(location = 0) out vec2 outTexCoord;
-layout(location = 1) out vec3 outNormal;
+layout(location = 1) out vec4 outNormal;
 
 void main() {
-    gl_Position = gl_Position = ubo.mvp * vec4(inPosition.xyz, 1.0);
-	outNormal = ubo.world * normalize(inNormal);
+    gl_Position = ubo.mvp * vec4(inPosition.xyz, 1.0);
+	outNormal = ubo.world * vec4(normalize(inNormal).xyz, 1.0);
 	outTexCoord = inTexCoord;
 }

@@ -1,5 +1,9 @@
 #include "Camera.h"
 
+ComponentFactory<Camera>& Camera::GetCameras() {
+	return Components::CameraComponents;
+}
+
 void Camera::SetViewPort(int x, int y, int width, int height) {
 	viewport_.x = x;
 	viewport_.y = y;

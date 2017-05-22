@@ -6,6 +6,7 @@
 
 class Transform {
 public:
+	static const ComponentFactory<Transform>& GetTransforms();
 	static void UpdateLocalMatrices();
 
 	const Vec3& GetLocalPosition() const { return pos_; }
