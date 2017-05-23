@@ -5,9 +5,17 @@
 #include "VulkanDrawable.h"
 #include "Material.h"
 
+
+struct SubMeshPart {
+	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indices;
+	Material material;
+};
+
 struct SubMesh {
 	std::string name;
-	std::vector<VertexPTN> vertices;
+	std::vector<SubMeshPart> parts;
+	std::vector<Vertex> vertices;
 	Vulkan::VulkanRenderer* pRenderer;
 	std::vector<uint32_t> indices;
 	Vec3 aabbMin;

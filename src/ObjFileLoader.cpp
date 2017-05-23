@@ -17,14 +17,14 @@ namespace FileFormats {
 		}
 		for (const auto& shape : shapes) {
 			SubMesh* subMesh = mesh.AddSubMesh();
-			std::vector<VertexPTN> vertices;
+			std::vector<Vertex> vertices;
 			std::vector<uint32_t> indices;
 
-			std::unordered_map<VertexPTN, int32_t> uniqueVertices = { };
+			std::unordered_map<Vertex, int32_t> uniqueVertices = { };
 			subMesh->name = shape.name;
 
 			for (const auto& index : shape.mesh.indices) {
-				VertexPTN vertex = { };
+				Vertex vertex = { };
 				vertex.position = {
 					attrib.vertices[3 * index.vertex_index + 0],
 					attrib.vertices[3 * index.vertex_index + 1],

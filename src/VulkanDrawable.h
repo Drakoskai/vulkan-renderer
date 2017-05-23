@@ -18,7 +18,7 @@ namespace Vulkan {
 		VulkanDrawable(VulkanRenderer* renderer);
 		~VulkanDrawable();
 		void SetRenderDevice(VulkanRenderer* renderer);
-		void Generate(const std::vector<VertexPTN>& vertices, const std::vector<uint32_t>& indices, const Material& material);
+		void Generate(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Material& material);
 		void RecordDrawCommand(const VkCommandBuffer& commandBuffer) const;
 		void CreateUniformBuffer();
 		void CreateDescriptorPool();

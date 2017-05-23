@@ -1,5 +1,6 @@
 #ifndef POINT_LIGHT_H_
 #define POINT_LIGHT_H_
+
 #include <cstdint>
 #include "KaiMath.h"
 #include "Component.h"

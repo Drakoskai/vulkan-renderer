@@ -26,7 +26,6 @@ private:
 	static MeshRenderer* Get(uint32_t index);
 	GameObject* pObj_ = nullptr;
 	Mesh* pMesh_ = nullptr;
-	Vulkan::VulcanRenderer* pRenderer_ = nullptr;
 	std::vector<Material*> materials_;
 };
 

@@ -27,7 +27,7 @@ namespace Vulkan {
 		descriptorPool_ = { pRenderer_->device_, vkDestroyDescriptorPool };
 	}
 
-	void VulkanDrawable::Generate(const std::vector<VertexPTN>& vertices, const std::vector<uint32_t>& indices, const Material& material) {
+	void VulkanDrawable::Generate(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices, const Material& material) {
 		if (!pRenderer_) {
 			throw std::runtime_error("Vulkan Drawable not intialized!");
 		}
@@ -43,7 +43,7 @@ namespace Vulkan {
 	}
 
 	void VulkanDrawable::RecordDrawCommand(const VkCommandBuffer& commandBuffer) const {
-		if (numIndices_ == 0 || !pPipeline_) { return; }
+		if (numIndices_ == 0) { return; }
 
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pPipeline_->GetPipeline());
 
