@@ -4,19 +4,11 @@ ComponentFactory<Camera>& Camera::GetCameras() {
 	return Components::CameraComponents;
 }
 
-void Camera::SetViewPort(int x, int y, int width, int height) {
-	viewport_.x = x;
-	viewport_.y = y;
-	viewport_.width = width;
-	viewport_.height = height;
-}
-
 void Camera::SetProjection(float left, float right, float bottom, float top, float n, float f) {
-	projection_ = ProjectionType::Orthographic;
-	orthoProperties_.left = left;
-	orthoProperties_.right = right;
-	orthoProperties_.bottom = bottom;
-	orthoProperties_.top = top;
+	left = left;
+	right = right;
+	bottom = bottom;
+	top = top;
 	near_ = n;
 	far_ = f;
 
@@ -24,13 +16,11 @@ void Camera::SetProjection(float left, float right, float bottom, float top, flo
 }
 
 void Camera::SetProjection(float fovDegrees, float aspect, float n, float f) {
-	projection_ = ProjectionType::Perspective;
 	proj_ = glm::perspective(fovDegrees, aspect, n, f);
 	proj_[1][1] *= -1;
 }
 
 void Camera::SetProjection(float fovDegrees, float w, float h, float n, float f) {
-	projection_ = ProjectionType::Perspective;
 	proj_ = glm::perspective(fovDegrees, static_cast<float>(w) / static_cast<float>(h), n, f);
 	proj_[1][1] *= -1;
 }
@@ -39,7 +29,6 @@ void Camera::SetProjection(const Matrix& proj) { proj_ = proj; }
 
 Matrix Camera::GetView() const { return view_; }
 
-Camera::ProjectionType Camera::GetProjectionType() const { return projection_; }
 
 GameObject* Camera::GetGameObject() const { return pObj_; }
 
