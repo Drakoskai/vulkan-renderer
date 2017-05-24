@@ -14,8 +14,8 @@ public:
 	virtual void InitMesh(Mesh* mesh) = 0;
 };
 
-static const std::string DefaultVertexShader = "shaders/default_vert.spv";
-static const std::string DefaultFragmentShader = "shaders/default_frag.spv";
+static const std::string DefaultVertexShader = "assets/shaders/default_vert.spv";
+static const std::string DefaultFragmentShader = "assets/shaders/default_frag.spv";
 
 struct ShaderId {
 private:

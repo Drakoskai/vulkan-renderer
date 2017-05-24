@@ -58,8 +58,8 @@ namespace FileFormats {
 			material.emissive = Vec3(mat.emission[0], mat.emission[1], mat.emission[2]);
 			material.specular = Vec3(mat.specular[0], mat.specular[1], mat.specular[2]);
 			material.diffuseTexture = materialbase + mat.diffuse_texname;
-			material.shader.SetVertexShader("shaders/light_vert.spv");
-			material.shader.SetFragmentShader("shaders/light_frag.spv");
+			material.shader.SetVertexShader("assets/shaders/light_vert.spv");
+			material.shader.SetFragmentShader("assets/shaders/light_frag.spv");
 			
 			subMesh->vertices = vertices;
 			subMesh->indices = indices;

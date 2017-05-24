@@ -12,10 +12,10 @@ const int WIDTH = 800;
 const int HEIGHT = 600;
 
 
-const std::string CHALET_MODEL_PATH = "models/chalet.obj";
-const std::string CHALET_TEXTURE_PATH = "textures/chalet.jpg";
+const std::string CHALET_MODEL_PATH = "assets/models/chalet.obj";
+const std::string CHALET_TEXTURE_PATH = "assets/textures/chalet.jpg";
 
-const std::string CUBE_MODEL_PATH = "models/cube/";
+const std::string CUBE_MODEL_PATH = "assets/models/cube/";
 const std::string CUBE_MODEL_NAME= "cube.obj";
 
 
@@ -59,7 +59,7 @@ public:
 			Transform* cubeTransform = cube->GetComponent<Transform>();
 
 			cubeTransform->SetRotation(rotate(glm::quat(), time * glm::radians(90.0f), Vec3(0.0f, 0.0f, 1.0f)));			
-			//renderer->PrepareFrame();
+			renderer->PrepareFrame();
 			renderer->PresentFrame();
 		}
 
