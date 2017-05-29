@@ -180,7 +180,7 @@
     <ClInclude Include="src\Component.h" />
     <ClInclude Include="src\DirectionalLight.h" />
     <ClInclude Include="src\GameObject.h" />
-    <ClInclude Include="src\GraphicsStructs.h" />
+    <ClInclude Include="src\GfxTypes.h" />
     <ClInclude Include="src\KaiMath.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Mesh.h" />
@@ -189,7 +189,6 @@
     <ClInclude Include="src\ObjFileLoader.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\PointLight.h" />
-    <ClInclude Include="src\GraphicsEnums.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\SpotLight.h" />
     <ClInclude Include="src\SubMesh.h" />

@@ -17,16 +17,18 @@ namespace Vulkan {
 		VulkanPipeline(VulkanRenderer* renderer);
 		~VulkanPipeline();
 		void SetRenderDevice(VulkanRenderer* renderer);
-		void CreatePipeline(const VulkanVertexBuffer& vertexBuffer, const ShaderId shaderid);
+		void CreatePipeline(const std::vector<VkVertexInputBindingDescription>& bindingDescriptions, const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions, const ShaderId shaderid);
 		const VkCom<VkPipeline>& GetPipeline() const { return pipeline_; }
 		const VkCom<VkPipelineLayout>& GetPipelineLayout() const { return pipelineLayout_; }
 		const VkCom<VkDescriptorSetLayout>& GetDescriptorSetLayout() const { return descriptorSetLayout_; }
+		bool IsGenerated() const { return isGenerated_; }
 	private:
 		void CreateDescriptorSetLayout();
 		VulkanRenderer* pRenderer_;
 		VkCom<VkDescriptorSetLayout> descriptorSetLayout_;
 		VkCom<VkPipelineLayout> pipelineLayout_;
 		VkCom<VkPipeline> pipeline_;
+		bool isGenerated_;
 	};
 }
 #endif

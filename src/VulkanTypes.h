@@ -1,8 +1,8 @@
 #pragma once
 
-#include "KaiMath.h"
 #include <vulkan/vulkan.h>
-#include "GraphicsEnums.h"
+#include "KaiMath.h"
+#include "GfxTypes.h"
 
 namespace Vulkan {
 	const std::vector<const char*> validationLayers = {
@@ -34,6 +34,15 @@ namespace Vulkan {
 		Matrix proj;
 		Matrix world;
 		Vec3 lightpos;
+	};
+
+	struct UniformMaterialObject {
+		Vec3 ambient;
+		Vec3 diffuse;
+		Vec3 emissive;
+		Vec3 specular;
+		float shininess;
+		float alpha;
 	};
 
 	struct VkTextureFilter {

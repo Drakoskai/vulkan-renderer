@@ -2,7 +2,7 @@
 
 #include "GameObject.h"
 #include <vector>
-#include "GraphicsStructs.h"
+#include "GfxTypes.h"
 
 
 class Scene {

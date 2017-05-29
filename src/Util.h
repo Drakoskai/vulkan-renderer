@@ -4,6 +4,10 @@
 #include <vector>
 #include <fstream>
 
+const std::string MODELS_PATH = "assets/models/";
+const std::string MATERIALS_PATH = "assets/materials/";
+const std::string TEXTURES_PATH = "assets/";
+
 template<typename T>
 void SafeDelete(T* ptr) {
 	if(ptr) {

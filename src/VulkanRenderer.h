@@ -7,19 +7,21 @@
 
 #include <unordered_map>
 #include <GLFW/glfw3.h>
-#include "GraphicsStructs.h"
+#include "GfxTypes.h"
 #include "VkCom.h"
 #include "VulkanTypes.h"
 #include "Vertex.h"
 #include "Util.h"
 #include "Mesh.h"
 #include "VulkanTexture.h"
+#include "VulkanDrawable.h"
+#include "VulkanShader.h"
+#include "VulkanPipeline.h"
 
 namespace Vulkan {
 
 	const int WIDTH = 800;
 	const int HEIGHT = 600;
-	const std::string CUBE_TEXTURE_PATH = "models/cube/texture/cube_dm.png";
 #ifdef NDEBUG
 	const bool enableValidationLayers = false;
 #else

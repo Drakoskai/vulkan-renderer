@@ -35,12 +35,14 @@ namespace Vulkan
 		int texWidth;
 		int texHeight;
 		int texChannels;
-		stbi_uc* pixels = stbi_load(file_.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+		std::string filepath(TEXTURES_PATH + file_);
+		stbi_uc* pixels = stbi_load(filepath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 		VkDeviceSize imageSize = texWidth * texHeight * 4;
 
 		if (!pixels) {
-			throw std::runtime_error("failed to load texture image!");
+			throw std::runtime_error("failed to load texture image! " + filepath);
 		}
+
 		textureWidth_ = texWidth;
 		textureHeight_ = textureHeight_;
 		VkCom<VkImage> stagingImage{ pRenderer_->device_, vkDestroyImage };

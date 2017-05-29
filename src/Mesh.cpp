@@ -12,8 +12,8 @@ Mesh::Mesh(Vulkan::VulkanRenderer* renderer) : mNextSubMesh(0), pRenderer(render
 
 Mesh::~Mesh() {}
 
-void Mesh::LoadFromFile(const std::string& path, const std::string& filename) {
-	FileFormats::LoadObjFile(path + filename, path, *this);
+void Mesh::LoadFromFile(const std::string& filename) {
+	FileFormats::LoadObjFile(filename, *this);
 }
 
 const Vec3& Mesh::GetAABBMin() const { return m_aabbMin; }
@@ -21,11 +21,11 @@ const Vec3& Mesh::GetAABBMin() const { return m_aabbMin; }
 const Vec3& Mesh::GetAABBMax() const { return m_aabbMax; }
 
 const Vec3& Mesh::GetSubMeshAABBMin(uint32_t subMeshIndex) const {
-	return m_subMeshes[subMeshIndex < m_subMeshes.size() ? subMeshIndex : 0].aabbMin;
+	return Vec3();
 }
 
 const Vec3& Mesh::GetSubMeshAABBMax(uint32_t subMeshIndex) const {
-	return m_subMeshes[subMeshIndex < m_subMeshes.size() ? subMeshIndex : 0].aabbMax;
+	return Vec3();
 }
 
 size_t Mesh::GetSubMeshCount() const {
@@ -43,8 +43,6 @@ SubMesh* Mesh::AddSubMesh() {
 	}
 
 	auto subMesh = &m_subMeshes[mNextSubMesh];
-	subMesh->SetRenderDevice(pRenderer);
-
 	mNextSubMesh++;
 
 	return subMesh;
@@ -53,17 +51,10 @@ SubMesh* Mesh::AddSubMesh() {
 std::vector<SubMesh>& Mesh::GetSubMeshes() { return m_subMeshes; }
 
 void Mesh::SolveAABB() {
-	for (auto submesh : m_subMeshes) {
-		submesh.SolveAABB();
-		m_aabbMin = Min(m_aabbMin, submesh.aabbMin);
-		m_aabbMax = Max(m_aabbMax, submesh.aabbMax);
-	}
 }
 
 void Mesh::Generate() {
 	if (!pRenderer) { return; }
-	for (auto& submesh : m_subMeshes) {
-		submesh.Generate();
-	}
+	pRenderer->GetDrawable()->Generate(m_subMeshes);
 	pRenderer->RecreateSwapChain();
 }

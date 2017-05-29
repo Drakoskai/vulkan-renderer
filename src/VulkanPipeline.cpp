@@ -1,18 +1,17 @@
 #include "VulkanPipeline.h"
 #include "VulkanRenderer.h"
 #include "VulkanDrawable.h"
-#include "VulkanVertexBuffer.h"
 
 namespace Vulkan {
-	VulkanPipeline::VulkanPipeline() : pRenderer_(nullptr) {}
+	VulkanPipeline::VulkanPipeline() : pRenderer_(nullptr), isGenerated_(false) {}
 
-	VulkanPipeline::VulkanPipeline(VulkanRenderer* renderer) : pRenderer_(renderer) {
+	VulkanPipeline::VulkanPipeline(VulkanRenderer* renderer) : pRenderer_(renderer), isGenerated_(false) {
 		pipelineLayout_ = { pRenderer_->device_, vkDestroyPipelineLayout };
 		pipeline_ = { pRenderer_->device_, vkDestroyPipeline };
 		descriptorSetLayout_ = { pRenderer_->device_, vkDestroyDescriptorSetLayout };
 	}
 
-	VulkanPipeline::~VulkanPipeline() { }
+	VulkanPipeline::~VulkanPipeline() {}
 
 	void VulkanPipeline::SetRenderDevice(VulkanRenderer* renderer) {
 		pRenderer_ = renderer;
@@ -47,13 +46,10 @@ namespace Vulkan {
 		}
 	}
 
-	void VulkanPipeline::CreatePipeline(const VulkanVertexBuffer& vertexBuffer, const ShaderId shaderid) {
-		CreateDescriptorSetLayout();
+	void VulkanPipeline::CreatePipeline(const std::vector<VkVertexInputBindingDescription>& bindingDescriptions, const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions, const ShaderId shaderid) {
+		CreateDescriptorSetLayout(); 
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-
-		auto bindingDescriptions = vertexBuffer.GetBindingDescriptions();
-		auto attributeDescriptions = vertexBuffer.GetattributeDescriptions();
 
 		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
 		vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
@@ -147,5 +143,6 @@ namespace Vulkan {
 		if (vkCreateGraphicsPipelines(pRenderer_->device_, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, pipeline_.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create graphics pipeline!");
 		}
+		isGenerated_ = true;
 	}
 }

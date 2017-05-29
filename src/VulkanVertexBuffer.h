@@ -4,19 +4,36 @@
 #include <vector>
 #include "VkCom.h"
 #include "Vertex.h"
+#include "VulkanPipeline.h"
+#include "Material.h"
 
 namespace Vulkan {
 	class VulkanRenderer;
+
+	struct VertexBufferSection {
+		VkBuffer buffer = VK_NULL_HANDLE;
+		uint32_t offset = 0;
+		uint32_t idxoffset = 0;
+		uint32_t size = 0;
+		uint64_t materialId = 0L;
+		VulkanPipeline* pipeline;
+		VkVertexInputBindingDescription bindingDescription;
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+	};
+
 	class VulkanVertexBuffer {
 	public:
 		VulkanVertexBuffer();
 		~VulkanVertexBuffer();
 		void SetRenderer(VulkanRenderer* renderer);
-		void Generate(const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices);		
+		void AddGeometry(const MaterialGroup& group, VulkanPipeline* pipeline);
+		void Generate();
 		const VkCom<VkBuffer>& GetVertexBuffer() const { return vertexBuffer_; }
 		const VkCom<VkBuffer>& GetIndexBuffer() const { return indexBuffer_; }
 		const std::vector<VkVertexInputAttributeDescription>& GetattributeDescriptions() const { return attributeDescriptions_; }
-		const std::vector<VkVertexInputBindingDescription>& GetBindingDescriptions() const { return bindingDescriptions_; }
+		const std::vector<VkVertexInputBindingDescription>& GetBindingDescriptions() const { return bindingDescriptions_; }	
+		std::vector<VertexBufferSection> vertexBufferSections_;
+	
 	private:
 		void CreateVertexBuffer(const std::vector<Vertex>& vertices);
 		void CreateIndexBuffer(const std::vector<uint32_t>& indices);
@@ -26,6 +43,7 @@ namespace Vulkan {
 		VkCom<VkDeviceMemory> indexBufferMemory_{ VK_NULL_HANDLE };
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions_;
 		std::vector<VkVertexInputBindingDescription> bindingDescriptions_;
+		std::vector<std::pair<MaterialGroup, VulkanPipeline*>> geometries_;		
 		VulkanRenderer* pRenderer_;
 	};
 }

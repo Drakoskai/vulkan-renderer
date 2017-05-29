@@ -2,7 +2,6 @@
 
 #include "KaiMath.h"
 #include "Component.h"
-#include "GraphicsStructs.h"
 
 class Camera {
 public:

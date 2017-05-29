@@ -5,7 +5,6 @@
 #include <vector>
 #include "VkCom.h"
 
-
 struct Vertex {
 	Vec3 position;
 	Vec2 texCoord;
@@ -24,4 +23,3 @@ namespace std {
 		}
 	};
 }
-

@@ -2,7 +2,7 @@
 
 #include <vulkan/vulkan.h>
 #include "VkCom.h"
-#include "GraphicsStructs.h"
+#include "GfxTypes.h"
 #include <vector>
 
 namespace Vulkan

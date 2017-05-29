@@ -3,6 +3,7 @@
 #include "KaiMath.h"
 #include <vector>
 #include "SubMesh.h"
+#include "VulkanShader.h"
 
 class Mesh {
 public:
@@ -10,7 +11,7 @@ public:
 	Mesh(Vulkan::VulkanRenderer* renderer);
 	~Mesh();
 	void SetRenderDevice(Vulkan::VulkanRenderer* renderer) { pRenderer = renderer; }
-	void LoadFromFile(const std::string& path, const std::string& filename);
+	void LoadFromFile(const std::string& filename);
 	const Vec3& GetAABBMin() const;
 	const Vec3& GetAABBMax() const;
 	const Vec3& GetSubMeshAABBMin(uint32_t subMeshIndex) const;
