@@ -28,14 +28,21 @@ namespace Vulkan {
 		uboLayoutBinding.pImmutableSamplers = nullptr;
 		uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-		VkDescriptorSetLayoutBinding samplerLayoutBinding;
-		samplerLayoutBinding.binding = 1;
-		samplerLayoutBinding.descriptorCount = 1;
-		samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		samplerLayoutBinding.pImmutableSamplers = nullptr;
-		samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+		VkDescriptorSetLayoutBinding diffuseSamplerLayoutBinding;
+		diffuseSamplerLayoutBinding.binding = 1;
+		diffuseSamplerLayoutBinding.descriptorCount = 1;
+		diffuseSamplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		diffuseSamplerLayoutBinding.pImmutableSamplers = nullptr;
+		diffuseSamplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-		std::vector<VkDescriptorSetLayoutBinding> bindings = { uboLayoutBinding, samplerLayoutBinding };
+		VkDescriptorSetLayoutBinding normalLayoutBinding;
+		normalLayoutBinding.binding = 2;
+		normalLayoutBinding.descriptorCount = 1;
+		normalLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		normalLayoutBinding.pImmutableSamplers = nullptr;
+		normalLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+		std::vector<VkDescriptorSetLayoutBinding> bindings = { uboLayoutBinding, diffuseSamplerLayoutBinding, normalLayoutBinding };
 		VkDescriptorSetLayoutCreateInfo layoutInfo = {};
 		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 		layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());

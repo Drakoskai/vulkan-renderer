@@ -1,4 +1,5 @@
-#pragma once
+#ifndef VULKAN_TYPES_H__
+#define VULKAN_TYPES_H__
 
 #include <vulkan/vulkan.h>
 #include "KaiMath.h"
@@ -61,3 +62,4 @@ namespace Vulkan {
 		}
 	};
 }
+#endif

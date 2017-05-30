@@ -1,11 +1,10 @@
 #include "VulkanRenderer.h"
 #include <set>
-#include "VulkanTypes.h"
 #include <chrono>
-#include "ObjFileLoader.h"
+#include <glm/gtx/transform.hpp>
+#include "VulkanTypes.h"
 #include "Transform.h"
 #include "Camera.h"
-#include "MeshRenderer.h"
 
 namespace Vulkan {
 

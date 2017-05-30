@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include <glm/gtc/matrix_transform.hpp>
 
 ComponentFactory<Camera>& Camera::GetCameras() {
 	return Components::CameraComponents;
@@ -13,6 +14,7 @@ void Camera::SetProjection(float left, float right, float bottom, float top, flo
 	far_ = f;
 
 	proj_ = glm::ortho(left, right, bottom, top, n, f);
+	proj_[1][1] *= -1;
 }
 
 void Camera::SetProjection(float fovDegrees, float aspect, float n, float f) {

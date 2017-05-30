@@ -1,4 +1,5 @@
-#pragma once
+#ifndef KAI_MATH_H__
+#define KAI_MATH_H__
 
 #ifndef GLM_FORCE_RADIANS
 #define GLM_FORCE_RADIANS
@@ -9,9 +10,9 @@
 #ifndef GLM_ENABLE_EXPERIMENTAL
 #define GLM_ENABLE_EXPERIMENTAL
 #endif
+
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/detail/type_vec3.hpp>
 #include <glm/gtx/hash.hpp>
 #include <vector>
@@ -39,7 +40,7 @@ static bool IsEqual(float f1, float f2, float epsilon) {
 	return abs(f1 - f2) < epsilon;
 }
 
-static bool IsEqual(float f1, float f2) {	
+static bool IsEqual(float f1, float f2) {
 	return IsEqual(f1, f2, DefaultEpsilon);
 }
 
@@ -62,7 +63,7 @@ static uint32_t GetHash(const char* s, uint32_t length) {
 	uint32_t h = 31;
 	uint32_t i = 0;
 
-	while(i < length) {
+	while (i < length) {
 		h = (h * A) ^ (s[0] * B);
 		++s;
 		++i;
@@ -71,36 +72,41 @@ static uint32_t GetHash(const char* s, uint32_t length) {
 	return h;
 }
 
+static uint32_t GetHash(std::string s) {
+
+	return GetHash(s.c_str(), static_cast<uint32_t>(s.size()));
+}
+
 static void GetMinMax(const std::vector<Vec3>& points, Vec3& outMin, Vec3& outMax) {
-	if(!points.empty()) {
+	if (!points.empty()) {
 		outMin = points[0];
 		outMax = points[0];
 	}
 
-	for(std::size_t i = 1, s = points.size(); i < s; ++i) {
+	for (size_t i = 1, s = points.size(); i < s; ++i) {
 		const Vec3& point = points[i];
 
-		if(point.x < outMin.x) {
+		if (point.x < outMin.x) {
 			outMin.x = point.x;
 		}
 
-		if(point.y < outMin.y) {
+		if (point.y < outMin.y) {
 			outMin.y = point.y;
 		}
 
-		if(point.z < outMin.z) {
+		if (point.z < outMin.z) {
 			outMin.z = point.z;
 		}
 
-		if(point.x > outMax.x) {
+		if (point.x > outMax.x) {
 			outMax.x = point.x;
 		}
 
-		if(point.y > outMax.y) {
+		if (point.y > outMax.y) {
 			outMax.y = point.y;
 		}
 
-		if(point.z > outMax.z) {
+		if (point.z > outMax.z) {
 			outMax.z = point.z;
 		}
 	}
@@ -118,3 +124,4 @@ static void GetCorners(const Vec3& min, const Vec3& max, std::vector<Vec3>& outC
 		Vec3(max.x, min.y, max.z)
 	};
 }
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UTIL_H__
+#define UTIL_H__
 
 #include <functional>
 #include <vector>
@@ -44,3 +45,4 @@ std::wstring StringToWString(const std::string& s);
 int VDebugPrintF(const char* format, va_list argList);
 
 int DebugPrintF(const char* format, ...);
+#endif

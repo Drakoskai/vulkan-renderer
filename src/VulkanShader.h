@@ -1,9 +1,10 @@
-#pragma once
+#ifndef VULKAN_SHADER_H__
+#define VULKAN_SHADER_H__
 
 #include <vulkan/vulkan.h>
+#include <vector>
 #include "VkCom.h"
 #include "GfxTypes.h"
-#include <vector>
 
 namespace Vulkan
 {
@@ -20,3 +21,4 @@ namespace Vulkan
 		void LoadShaders(ShaderId shaderId);
 	};
 }
+#endif

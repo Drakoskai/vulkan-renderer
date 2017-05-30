@@ -2,7 +2,6 @@
 #define MESH_RENDERER_H_
 
 #include "Component.h"
-#include "KaiMath.h"
 
 class Mesh;
 struct Material;
@@ -24,9 +23,9 @@ private:
 	static int Type() { return 5; }
 	static uint32_t New();
 	static MeshRenderer* Get(uint32_t index);
+	std::vector<Material*> materials_;
 	GameObject* pObj_ = nullptr;
 	Mesh* pMesh_ = nullptr;
-	std::vector<Material*> materials_;
 };
 
 namespace Components {

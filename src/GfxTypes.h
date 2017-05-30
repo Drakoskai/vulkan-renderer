@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GFX_TYPES_H__
+#define GFX_TYPES_H__
 
 enum class ClearFlags : uint32_t { Color = 1 << 0, Depth = 1 << 1, DontClear = 1 << 2 };
 
@@ -148,7 +149,7 @@ namespace std {
 	};
 }
 
-static const TextureId EmptyTextureId = TextureId("");
+static const TextureId EmptyTextureId = {};
 
 struct PipelineContext {
 	BlendMode blendMode;
@@ -157,3 +158,4 @@ struct PipelineContext {
 	FillMode fillMode;
 	PrimitiveTopology primitiveTopology;
 };
+#endif

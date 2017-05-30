@@ -14,14 +14,14 @@ namespace Vulkan {
 		indexBufferMemory_ = { pRenderer_->device_, vkFreeMemory };
 	}
 
-	void VulkanVertexBuffer::AddGeometry(const MaterialGroup& group, VulkanPipeline* pipeline) {
-		std::pair<MaterialGroup, VulkanPipeline*> pair;
-		pair.first = group;
+	void VulkanVertexBuffer::AddGeometry(const SubMesh& submesh, VulkanPipeline* pipeline) {
+		std::pair<SubMesh, VulkanPipeline*> pair;
+		pair.first = submesh;
 		pair.second = pipeline;
 		geometries_.push_back(pair);
 	}
 
-	void VulkanVertexBuffer::Generate() {
+	void VulkanVertexBuffer::Generate(VulkanDrawable* drawable) {
 		uint32_t offset = 0;
 		uint32_t idxoffset = 0;
 		std::vector<Vertex> vertices;
@@ -37,10 +37,6 @@ namespace Vulkan {
 			section.pipeline = group.second;
 			section.size = static_cast<uint32_t>(group.first.indices.size());
 
-			size_t vertSize = offset + group.first.vertices.size();
-			size_t idxSize = idxoffset + group.first.indices.size();
-			
-
 			for (size_t i = 0; i < group.first.vertices.size(); i++) {
 				vertices.push_back(group.first.vertices[i]);
 			}
@@ -50,6 +46,9 @@ namespace Vulkan {
 			}
 			idxoffset = idxoffset + static_cast<uint32_t>(indices.size());
 			offset = offset + static_cast<uint32_t>(vertices.size());
+
+			section.descriptorSet = drawable->CreateDescriptorSet(group.second);
+			drawable->AllocateDescriptorSet(section.descriptorSet, section.materialId);
 
 			vertexBufferSections_.push_back(section);
 		}
@@ -87,4 +86,5 @@ namespace Vulkan {
 		pRenderer_->CreateBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer_, indexBufferMemory_);
 		pRenderer_->CopyBuffer(stagingBuffer, indexBuffer_, bufferSize);
 	}
+
 }

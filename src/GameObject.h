@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GAME_OBJECT_H__
+#define GAME_OBJECT_H__
 
 #include <cstdint>
 #include "Transform.h"
@@ -64,3 +65,4 @@ private:
 	uint32_t layer_ = 1;
 	bool isEnabled_ = true;
 };
+#endif

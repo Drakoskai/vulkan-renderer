@@ -5,7 +5,7 @@
 #include "VkCom.h"
 #include "Vertex.h"
 #include "VulkanPipeline.h"
-#include "Material.h"
+#include "SubMesh.h"
 
 namespace Vulkan {
 	class VulkanRenderer;
@@ -17,6 +17,7 @@ namespace Vulkan {
 		uint32_t size = 0;
 		uint64_t materialId = 0L;
 		VulkanPipeline* pipeline;
+		VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
 		VkVertexInputBindingDescription bindingDescription;
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
 	};
@@ -26,14 +27,13 @@ namespace Vulkan {
 		VulkanVertexBuffer();
 		~VulkanVertexBuffer();
 		void SetRenderer(VulkanRenderer* renderer);
-		void AddGeometry(const MaterialGroup& group, VulkanPipeline* pipeline);
-		void Generate();
+		void AddGeometry(const SubMesh& group, VulkanPipeline* pipeline);
+		void Generate(VulkanDrawable* drawable);
 		const VkCom<VkBuffer>& GetVertexBuffer() const { return vertexBuffer_; }
 		const VkCom<VkBuffer>& GetIndexBuffer() const { return indexBuffer_; }
 		const std::vector<VkVertexInputAttributeDescription>& GetattributeDescriptions() const { return attributeDescriptions_; }
 		const std::vector<VkVertexInputBindingDescription>& GetBindingDescriptions() const { return bindingDescriptions_; }	
-		std::vector<VertexBufferSection> vertexBufferSections_;
-	
+		std::vector<VertexBufferSection> vertexBufferSections_;	
 	private:
 		void CreateVertexBuffer(const std::vector<Vertex>& vertices);
 		void CreateIndexBuffer(const std::vector<uint32_t>& indices);
@@ -43,7 +43,7 @@ namespace Vulkan {
 		VkCom<VkDeviceMemory> indexBufferMemory_{ VK_NULL_HANDLE };
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions_;
 		std::vector<VkVertexInputBindingDescription> bindingDescriptions_;
-		std::vector<std::pair<MaterialGroup, VulkanPipeline*>> geometries_;		
+		std::vector<std::pair<SubMesh, VulkanPipeline*>> geometries_;
 		VulkanRenderer* pRenderer_;
 	};
 }

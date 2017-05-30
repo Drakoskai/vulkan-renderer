@@ -1,4 +1,6 @@
-#pragma once
+#ifndef MESH_OPTIMIZER_H__
+#define MESH_OPTIMIZER_H__
+
 #include <cstdint>
 #include <cmath>
 
@@ -11,12 +13,10 @@ namespace MeshOptimizer {
 
 		// Bonus points for having a low number of tris still to
 		// use the vert, so we get rid of lone verts quickly.
-		float valenceBoost = pow(static_cast<float>(numActiveFaces),
-			-FindVertexScore_ValenceBoostPower);
+		float valenceBoost = pow(static_cast<float>(numActiveFaces), -FindVertexScore_ValenceBoostPower);
 		score += FindVertexScore_ValenceBoostScale * valenceBoost;
 
 		return score;
 	}
-
-
 }
+#endif

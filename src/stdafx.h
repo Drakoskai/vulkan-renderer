@@ -1,4 +1,5 @@
-#pragma once
+#ifndef STDAFX_H__
+#define STDAFX_H__
 
 #define GLFW_INCLUDE_VULKAN
 #define WIN32_LEAN_AND_MEAN
@@ -21,3 +22,4 @@
 #include <algorithm>
 #include <stdexcept>
 #include <math.h>
+#endif

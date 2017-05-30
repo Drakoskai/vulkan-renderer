@@ -1,8 +1,9 @@
-#pragma once
+#ifndef VERTEX_H__
+#define VERTEX_H__
 
-#include "KaiMath.h"
 #include <array>
 #include <vector>
+#include "KaiMath.h"
 #include "VkCom.h"
 
 struct Vertex {
@@ -23,3 +24,4 @@ namespace std {
 		}
 	};
 }
+#endif

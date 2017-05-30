@@ -1,7 +1,8 @@
-#pragma once
+#ifndef VULKAN_UTL_H__
+#define VULKAN_UTL_H__
 
 #include <vulkan/vulkan.h>
-#include "VkCom.h"
+#include <string>
 
 namespace Vulkan {
 
@@ -10,3 +11,4 @@ namespace Vulkan {
 
 	std::string VkResultToString(VkResult result);
 }
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CAMERA_H_
+#define CAMERA_H_
 
 #include "KaiMath.h"
 #include "Component.h"
@@ -37,10 +38,10 @@ private:
 	float far_ = 1.0f;
 	float aspect_ = 1.0f;
 
-	float left = 0.0f;
-	float right = 100.0f;
-	float top = 0.0f;
-	float bottom = 100.0f;
+	float left_ = 0.0f;
+	float right_ = 100.0f;
+	float top_ = 0.0f;
+	float bottom_ = 100.0f;
 
 	Matrix view_;
 	Matrix proj_;
@@ -51,3 +52,4 @@ private:
 namespace Components {
 	static ComponentFactory<Camera> CameraComponents;
 }
+#endif

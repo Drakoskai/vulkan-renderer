@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include <chrono>
+#include <glm/gtc/matrix_transform.hpp>
 #include "Util.h"
 #include "GfxTypes.h"
 #include "VulkanRenderer.h"
-
 #include "Scene.h"
 #include "Transform.h"
 #include "MeshRenderer.h"
@@ -39,11 +39,11 @@ public:
 		
 		Mesh* mesh = new Mesh();
 		renderer->InitMesh(mesh);
-		mesh->LoadFromFile(CUBE_MODEL_NAME);
+		//mesh->LoadFromFile(CUBE_MODEL_NAME);
+		mesh->LoadFromFile(SPONZA_MODEL_NAME);
 		MeshRenderer* cubeRenderer = model->GetComponent<MeshRenderer>();
 		cubeRenderer->SetMesh(mesh);
 		
-
 		scene->Add(model);
 
 		while(!glfwWindowShouldClose(window)) {
@@ -54,7 +54,7 @@ public:
 
 			Transform* modelTransform = model->GetComponent<Transform>();
 
-			modelTransform->SetRotation(rotate(glm::quat(), time * glm::radians(90.0f), Vec3(0.0f, 0.0f, 1.0f)));			
+			//modelTransform->SetRotation(rotate(glm::quat(), time * glm::radians(90.0f), Vec3(0.0f, 0.0f, 1.0f)));			
 			renderer->PrepareFrame();
 			renderer->PresentFrame();
 		}

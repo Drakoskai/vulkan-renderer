@@ -1,9 +1,9 @@
-#pragma once
+#ifndef SCENE_H__
+#define SCENE_H__
 
-#include "GameObject.h"
 #include <vector>
+#include "GameObject.h"
 #include "GfxTypes.h"
-
 
 class Scene {
 public:
@@ -18,3 +18,4 @@ private:
 	uint64_t nextFreeGameObject_;
 	IRenderer* pRenderer_;
 };
+#endif
