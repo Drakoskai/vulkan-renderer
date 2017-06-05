@@ -10,12 +10,37 @@ namespace FileFormats {
 	void LoadObjFile(const std::string& file, Mesh& mesh) {
 		tinyobj::attrib_t attrib;
 		std::vector<tinyobj::shape_t> shapes;
-		std::vector<tinyobj::material_t> materials;
+		std::vector<tinyobj::material_t> mats;
 		std::string err;
 		std::string filepath(MODELS_PATH + file);
 
-		if (!LoadObj(&attrib, &shapes, &materials, &err, filepath.c_str(), MATERIALS_PATH.c_str())) {
+		if (!LoadObj(&attrib, &shapes, &mats, &err, filepath.c_str(), MATERIALS_PATH.c_str())) {
 			throw std::runtime_error(err);
+		}
+		std::vector<Material> materials;
+		materials.resize(mats.size());
+
+		for (uint32_t i = 0; i < mats.size(); i++) {
+			materials[i].name = mats[i].name;
+			materials[i].opacity = mats[i].dissolve;
+			materials[i].reflection = mats[i].ior;
+			materials[i].ambient = Vec3(mats[i].ambient[0], mats[i].ambient[1], mats[i].ambient[2]);
+			materials[i].diffuse = Vec3(mats[i].diffuse[0], mats[i].diffuse[1], mats[i].diffuse[2]);
+			materials[i].emissive = Vec3(mats[i].emission[0], mats[i].emission[1], mats[i].emission[2]);
+			materials[i].specular = Vec3(mats[i].specular[0], mats[i].specular[1], mats[i].specular[2]);
+			materials[i].diffuseTexture = mats[i].diffuse_texname == "" ? EmptyTextureId : mats[i].diffuse_texname;
+			/*materials[i].alphaTexture =  mats[i].alpha_texname == "" ? EmptyTextureId :  mats[i].alpha_texname;
+			materials[i].ambientTexture =  mats[i].ambient_texname == "" ? EmptyTextureId :  mats[i].ambient_texname;
+			materials[i].bumpTexture =  mats[i].bump_texname == "" ? EmptyTextureId :  mats[i].bump_texname;
+			materials[i].displacementTexture =  mats[i].displacement_texname == "" ? EmptyTextureId :  mats[i].displacement_texname;
+			materials[i].specularTexture =  mats[i].specular_texname == "" ? EmptyTextureId :  mats[i].specular_texname;
+			materials[i].specularHighlightTexture =  mats[i].specular_highlight_texname == "" ? EmptyTextureId :  mats[i].specular_highlight_texname;*/
+
+			if (mats[i].illum == 2) {
+				materials[i].shader = DefaultLightShader;
+			} else {
+				materials[i].shader = DefaultUnlitShader;
+			}
 		}
 
 		std::unordered_map<Vertex, int32_t> uniqueVertices = {};
@@ -45,35 +70,7 @@ namespace FileFormats {
 						attrib.normals[3 * index.normal_index + 2]
 					};
 
-					auto& mat = materials[materialId];
-					Material material = {};
-					material.name = mat.name;
-					material.opacity = mat.dissolve;
-					material.reflection = mat.ior;
-					material.ambient = Vec3(mat.ambient[0], mat.ambient[1], mat.ambient[2]);
-					material.diffuse = Vec3(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]);
-					material.emissive = Vec3(mat.emission[0], mat.emission[1], mat.emission[2]);
-					material.specular = Vec3(mat.specular[0], mat.specular[1], mat.specular[2]);
-					material.diffuseTexture = mat.diffuse_texname == "" ? EmptyTextureId : mat.diffuse_texname;
-					material.alphaTexture = mat.alpha_texname == "" ? EmptyTextureId : mat.alpha_texname;
-					material.ambientTexture = mat.ambient_texname == "" ? EmptyTextureId : mat.ambient_texname;
-					material.bumpTexture = mat.bump_texname == "" ? EmptyTextureId : mat.bump_texname;
-					material.displacementTexture = mat.displacement_texname == "" ? EmptyTextureId : mat.displacement_texname;
-					material.specularTexture = mat.specular_texname == "" ? EmptyTextureId : mat.specular_texname;
-					material.specularHighlightTexture = mat.specular_highlight_texname == "" ? EmptyTextureId : mat.specular_highlight_texname;
-
-					if (mat.illum == 2) {
-						if(material.bumpTexture != EmptyTextureId)
-						{
-							material.shader = ShaderId("assets/shaders/phong_vert.spv", "assets/shaders/phong_dn_frag.spv");
-						}else
-						{
-							material.shader = DefaultLightShader;
-						}						
-					} else {
-						material.shader = DefaultUnlitShader;
-					}
-
+					Material material = materials[materialId];
 					SubMesh* subMesh = nullptr;
 					for (SubMesh& sm : mesh.GetSubMeshes()) {
 						if (sm.material == material) {

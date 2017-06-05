@@ -42,6 +42,7 @@ namespace Vulkan {
 		uint32_t nextDescriptor = 0;
 		VulkanVertexBuffer vertexBuffer_;
 		std::unordered_map<size_t, Material> materials_;
+		std::unordered_map<size_t, VkDescriptorSet> materialDescriptors_;
 		VulkanRenderer* pRenderer_;
 	};
 }

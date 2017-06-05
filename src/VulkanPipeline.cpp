@@ -35,14 +35,14 @@ namespace Vulkan {
 		diffuseSamplerLayoutBinding.pImmutableSamplers = nullptr;
 		diffuseSamplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-		VkDescriptorSetLayoutBinding normalLayoutBinding;
+		/*VkDescriptorSetLayoutBinding normalLayoutBinding;
 		normalLayoutBinding.binding = 2;
 		normalLayoutBinding.descriptorCount = 1;
 		normalLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		normalLayoutBinding.pImmutableSamplers = nullptr;
-		normalLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+		normalLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;*/
 
-		std::vector<VkDescriptorSetLayoutBinding> bindings = { uboLayoutBinding, diffuseSamplerLayoutBinding, normalLayoutBinding };
+		std::vector<VkDescriptorSetLayoutBinding> bindings = { uboLayoutBinding, diffuseSamplerLayoutBinding };
 		VkDescriptorSetLayoutCreateInfo layoutInfo = {};
 		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 		layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());

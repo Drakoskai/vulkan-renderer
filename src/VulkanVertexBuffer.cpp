@@ -21,7 +21,7 @@ namespace Vulkan {
 		geometries_.push_back(pair);
 	}
 
-	void VulkanVertexBuffer::Generate(VulkanDrawable* drawable) {
+	void VulkanVertexBuffer::Generate() {
 		uint32_t offset = 0;
 		uint32_t idxoffset = 0;
 		std::vector<Vertex> vertices;
@@ -46,10 +46,6 @@ namespace Vulkan {
 			}
 			idxoffset = idxoffset + static_cast<uint32_t>(indices.size());
 			offset = offset + static_cast<uint32_t>(vertices.size());
-
-			section.descriptorSet = drawable->CreateDescriptorSet(group.second);
-			drawable->AllocateDescriptorSet(section.descriptorSet, section.materialId);
-
 			vertexBufferSections_.push_back(section);
 		}
 		geometries_.clear();

@@ -28,7 +28,7 @@ namespace Vulkan {
 		~VulkanVertexBuffer();
 		void SetRenderer(VulkanRenderer* renderer);
 		void AddGeometry(const SubMesh& group, VulkanPipeline* pipeline);
-		void Generate(VulkanDrawable* drawable);
+		void Generate();
 		const VkCom<VkBuffer>& GetVertexBuffer() const { return vertexBuffer_; }
 		const VkCom<VkBuffer>& GetIndexBuffer() const { return indexBuffer_; }
 		const std::vector<VkVertexInputAttributeDescription>& GetattributeDescriptions() const { return attributeDescriptions_; }

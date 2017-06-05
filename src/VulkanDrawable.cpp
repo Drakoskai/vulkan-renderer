@@ -55,19 +55,28 @@ namespace Vulkan {
 		}
 		uint32_t descriptorsCount = static_cast<uint32_t>(materials_.size());
 		CreateDescriptorPool(descriptorsCount);
-		vertexBuffer_.Generate(this);
+		for (auto material : materials_) {
+			size_t materialKey = material.first;
+			if (materialDescriptors_.find(materialKey) == end(materialDescriptors_)) {
+				materialDescriptors_[materialKey] = CreateDescriptorSet(pipeline);
+				AllocateDescriptorSet(materialDescriptors_[materialKey], materialKey);
+			}
+		}
+
+		vertexBuffer_.Generate();
 	}
 
-	void VulkanDrawable::RecordDrawCommand(const VkCommandBuffer& commandBuffer) {		
-		for (auto section : vertexBuffer_.vertexBufferSections_) {		
+	void VulkanDrawable::RecordDrawCommand(const VkCommandBuffer& commandBuffer) {
+		for (auto section : vertexBuffer_.vertexBufferSections_) {
 			VulkanPipeline* pipeline = section.pipeline;
 			vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->GetPipeline());
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->GetPipelineLayout(), 0, 1, &section.descriptorSet, 0, nullptr);
+			size_t materialKey = section.materialId;
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->GetPipelineLayout(), 0, 1, &materialDescriptors_[materialKey], 0, nullptr);
 			VkBuffer vertexBuffers[] = { vertexBuffer_.GetVertexBuffer() };
 			VkDeviceSize offsets[] = { 0 };
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 			vkCmdBindIndexBuffer(commandBuffer, vertexBuffer_.GetIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);
-			vkCmdDrawIndexed(commandBuffer, section.size, 1, section.idxoffset, section.offset, 0);
+			vkCmdDrawIndexed(commandBuffer, section.size, 1, 0, section.offset, 0);
 		}
 	}
 
@@ -80,17 +89,16 @@ namespace Vulkan {
 	void VulkanDrawable::CreateDescriptorPool(uint32_t decriptorCount) {
 		std::array<VkDescriptorPoolSize, 2> poolSizes = {};
 		poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		poolSizes[0].descriptorCount = 256;
+		poolSizes[0].descriptorCount = decriptorCount;
 		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		poolSizes[1].descriptorCount = 256;
+		poolSizes[1].descriptorCount = decriptorCount;
 
 		VkDescriptorPoolCreateInfo poolInfo = {};
 		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 		poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
 		poolInfo.pNext = nullptr;
 		poolInfo.pPoolSizes = poolSizes.data();
-		poolInfo.maxSets = 256;
-		poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+		poolInfo.maxSets = decriptorCount + 1;
 
 		if (vkCreateDescriptorPool(pRenderer_->device_, &poolInfo, nullptr, descriptorPool_.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create descriptor pool!");
