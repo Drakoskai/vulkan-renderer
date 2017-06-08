@@ -149,7 +149,7 @@ namespace std {
 	};
 }
 
-static const TextureId EmptyTextureId = {};
+static const TextureId EmptyTextureId("textures/empty.png");
 
 struct PipelineContext {
 	BlendMode blendMode;

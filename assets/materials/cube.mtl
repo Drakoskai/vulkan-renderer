@@ -1,23 +1,27 @@
 newmtl cube
   Ns 10.0000
   Ni 1.5000
-  Tr 0  0
+  d 1.0000
+  Tr 0.0000
+  Tf 1.0000 1.0000 1.0000 
   illum 2
-  Ka 1 1 1
-  Kd 1 1 1
-  Ks 0.2 0.2 0.2
-  Ke 0 0 0
+  Ka 0.5880 0.5880 0.5880
+  Kd 0.5880 0.5880 0.5880
+  Ks 0.0000 0.0000 0.0000
+  Ke 0.0000 0.0000 0.0000
   map_Kd textures/sponza_ceiling_a_diff.tga
 
 newmtl cube2
   Ns 10.0000
   Ni 1.5000
-  Tr 0  0
+  d 1.0000
+  Tr 0.0000
+  Tf 1.0000 1.0000 1.0000 
   illum 2
-  Ka 1 1 1
-  Kd 1 1 1
-  Ks 0.2 0.2 0.2
-  Ke 0 0 0
+  Ka 0.5880 0.5880 0.5880
+  Kd 0.5880 0.5880 0.5880
+  Ks 0.0000 0.0000 0.0000
+  Ke 0.0000 0.0000 0.0000
   map_Kd textures/spnza_bricks_a_diff.tga
   map_bump textures/spnza_bricks_a_ddn.tga
   bump textures/spnza_bricks_a_ddn.tga

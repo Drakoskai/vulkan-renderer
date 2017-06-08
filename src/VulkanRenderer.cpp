@@ -116,10 +116,6 @@ namespace Vulkan {
 	}
 
 	VulkanTexture* VulkanRenderer::GetTexture(TextureId textureid) {
-		if (textureid == EmptyTextureId) {
-			return nullptr;
-		}
-
 		if (textures_.find(textureid) == end(textures_)) {
 			VulkanTexture t;
 			textures_[textureid] = t;

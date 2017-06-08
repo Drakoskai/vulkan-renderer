@@ -35,14 +35,15 @@ namespace Vulkan {
 		diffuseSamplerLayoutBinding.pImmutableSamplers = nullptr;
 		diffuseSamplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-		/*VkDescriptorSetLayoutBinding normalLayoutBinding;
+		VkDescriptorSetLayoutBinding normalLayoutBinding;
 		normalLayoutBinding.binding = 2;
 		normalLayoutBinding.descriptorCount = 1;
 		normalLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		normalLayoutBinding.pImmutableSamplers = nullptr;
-		normalLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;*/
+		normalLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-		std::vector<VkDescriptorSetLayoutBinding> bindings = { uboLayoutBinding, diffuseSamplerLayoutBinding };
+
+		std::vector<VkDescriptorSetLayoutBinding> bindings = { uboLayoutBinding, diffuseSamplerLayoutBinding, normalLayoutBinding };
 		VkDescriptorSetLayoutCreateInfo layoutInfo = {};
 		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 		layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
@@ -54,7 +55,7 @@ namespace Vulkan {
 	}
 
 	void VulkanPipeline::CreatePipeline(const std::vector<VkVertexInputBindingDescription>& bindingDescriptions, const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions, const ShaderId shaderid) {
-		CreateDescriptorSetLayout(); 
+		CreateDescriptorSetLayout();
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
@@ -125,6 +126,15 @@ namespace Vulkan {
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(layouts.size());
 		pipelineLayoutInfo.pSetLayouts = layouts.data();
+		std::vector<VkPushConstantRange> pushconstatRanges = {
+				VkPushConstantRange {
+					VK_SHADER_STAGE_FRAGMENT_BIT,
+					0,
+					sizeof(UniformMaterialObject)
+				}
+		};
+		pipelineLayoutInfo.pushConstantRangeCount = static_cast<uint32_t>(pushconstatRanges.size());
+		pipelineLayoutInfo.pPushConstantRanges = pushconstatRanges.data();
 
 		if (vkCreatePipelineLayout(pRenderer_->device_, &pipelineLayoutInfo, nullptr, pipelineLayout_.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create pipeline layout!");
@@ -146,6 +156,7 @@ namespace Vulkan {
 		pipelineInfo.subpass = 0;
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 		pipelineInfo.pDynamicState = &dynamicState;
+
 
 		if (vkCreateGraphicsPipelines(pRenderer_->device_, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, pipeline_.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create graphics pipeline!");

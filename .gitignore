@@ -314,3 +314,8 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+/assets/textures/hellknight.png
+/assets/textures/hellknight.tga
+/assets/textures/hellknight_local.tga
+/assets/textures/tongue.png
+/assets/materials/hellknight.mtl

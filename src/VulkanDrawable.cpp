@@ -31,7 +31,6 @@ namespace Vulkan {
 		if (!pRenderer_) {
 			throw std::runtime_error("Vulkan Drawable not intialized!");
 		}
-		uint32_t size = static_cast<uint32_t>(subMeshes.size());
 		vertexBuffer_.SetRenderer(pRenderer_);
 		for (auto submesh : subMeshes) {
 			size_t materialHash = submesh.material.HashCode();
@@ -69,8 +68,11 @@ namespace Vulkan {
 	void VulkanDrawable::RecordDrawCommand(const VkCommandBuffer& commandBuffer) {
 		for (auto section : vertexBuffer_.vertexBufferSections_) {
 			VulkanPipeline* pipeline = section.pipeline;
-			vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->GetPipeline());
 			size_t materialKey = section.materialId;
+			Material material = materials_[materialKey];
+			UniformMaterialObject pushConstants(material);
+			vkCmdPushConstants(commandBuffer, pipeline->GetPipelineLayout(), VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(pushConstants), &pushConstants);
+			vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->GetPipeline());
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->GetPipelineLayout(), 0, 1, &materialDescriptors_[materialKey], 0, nullptr);
 			VkBuffer vertexBuffers[] = { vertexBuffer_.GetVertexBuffer() };
 			VkDeviceSize offsets[] = { 0 };
@@ -87,11 +89,13 @@ namespace Vulkan {
 	}
 
 	void VulkanDrawable::CreateDescriptorPool(uint32_t decriptorCount) {
-		std::array<VkDescriptorPoolSize, 2> poolSizes = {};
+		std::array<VkDescriptorPoolSize, 3> poolSizes = {};
 		poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		poolSizes[0].descriptorCount = decriptorCount;
 		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		poolSizes[1].descriptorCount = decriptorCount;
+		poolSizes[2].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		poolSizes[2].descriptorCount = decriptorCount;
 
 		VkDescriptorPoolCreateInfo poolInfo = {};
 		poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -99,6 +103,7 @@ namespace Vulkan {
 		poolInfo.pNext = nullptr;
 		poolInfo.pPoolSizes = poolSizes.data();
 		poolInfo.maxSets = decriptorCount + 1;
+		poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 
 		if (vkCreateDescriptorPool(pRenderer_->device_, &poolInfo, nullptr, descriptorPool_.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create descriptor pool!");
@@ -141,31 +146,30 @@ namespace Vulkan {
 		descriptorWrites.push_back(uboDescriptor);
 
 		VulkanTexture* diffuseTexture = pRenderer_->GetTexture(materials_[materialHash].diffuseTexture);
-		if (diffuseTexture) {
-			VkWriteDescriptorSet texturDescriptor;
-			texturDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			texturDescriptor.pNext = nullptr;
-			texturDescriptor.dstSet = descriptorSet;
-			texturDescriptor.dstBinding = 1;
-			texturDescriptor.dstArrayElement = 0;
-			texturDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			texturDescriptor.descriptorCount = 1;
-			texturDescriptor.pImageInfo = &diffuseTexture->imageInfo_;
-			descriptorWrites.push_back(texturDescriptor);
-		}
+
+		VkWriteDescriptorSet textureDescriptorDescriptor;
+		textureDescriptorDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		textureDescriptorDescriptor.pNext = nullptr;
+		textureDescriptorDescriptor.dstSet = descriptorSet;
+		textureDescriptorDescriptor.dstBinding = 1;
+		textureDescriptorDescriptor.dstArrayElement = 0;
+		textureDescriptorDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		textureDescriptorDescriptor.descriptorCount = 1;
+		textureDescriptorDescriptor.pImageInfo = &diffuseTexture->imageInfo_;
+		descriptorWrites.push_back(textureDescriptorDescriptor);
+
 		VulkanTexture* normalTexture = pRenderer_->GetTexture(materials_[materialHash].bumpTexture);
-		if (normalTexture) {
-			VkWriteDescriptorSet texturDescriptor;
-			texturDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			texturDescriptor.pNext = nullptr;
-			texturDescriptor.dstSet = descriptorSet;
-			texturDescriptor.dstBinding = 2;
-			texturDescriptor.dstArrayElement = 0;
-			texturDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			texturDescriptor.descriptorCount = 1;
-			texturDescriptor.pImageInfo = &normalTexture->imageInfo_;
-			descriptorWrites.push_back(texturDescriptor);
-		}
+		VkWriteDescriptorSet textureDescriptor;
+		textureDescriptor.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		textureDescriptor.pNext = nullptr;
+		textureDescriptor.dstSet = descriptorSet;
+		textureDescriptor.dstBinding = 2;
+		textureDescriptor.dstArrayElement = 0;
+		textureDescriptor.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		textureDescriptor.descriptorCount = 1;
+		textureDescriptor.pImageInfo = &normalTexture->imageInfo_;
+		descriptorWrites.push_back(textureDescriptor);
+
 		vkUpdateDescriptorSets(pRenderer_->device_, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		return descriptorSet;
 	}

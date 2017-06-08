@@ -30,9 +30,9 @@ namespace FileFormats {
 			materials[i].specular = Vec3(mats[i].specular[0], mats[i].specular[1], mats[i].specular[2]);
 			materials[i].diffuseTexture = mats[i].diffuse_texname == "" ? EmptyTextureId : mats[i].diffuse_texname;
 			/*materials[i].alphaTexture =  mats[i].alpha_texname == "" ? EmptyTextureId :  mats[i].alpha_texname;
-			materials[i].ambientTexture =  mats[i].ambient_texname == "" ? EmptyTextureId :  mats[i].ambient_texname;
-			materials[i].bumpTexture =  mats[i].bump_texname == "" ? EmptyTextureId :  mats[i].bump_texname;
-			materials[i].displacementTexture =  mats[i].displacement_texname == "" ? EmptyTextureId :  mats[i].displacement_texname;
+			materials[i].ambientTexture =  mats[i].ambient_texname == "" ? EmptyTextureId :  mats[i].ambient_texname;*/
+			materials[i].bumpTexture = mats[i].bump_texname == "" ? EmptyTextureId : mats[i].bump_texname;
+			/*materials[i].displacementTexture =  mats[i].displacement_texname == "" ? EmptyTextureId :  mats[i].displacement_texname;
 			materials[i].specularTexture =  mats[i].specular_texname == "" ? EmptyTextureId :  mats[i].specular_texname;
 			materials[i].specularHighlightTexture =  mats[i].specular_highlight_texname == "" ? EmptyTextureId :  mats[i].specular_highlight_texname;*/
 
@@ -63,12 +63,13 @@ namespace FileFormats {
 						attrib.texcoords[2 * index.texcoord_index + 0],
 						1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
 					};
-
-					vertex.normal = {
-						attrib.normals[3 * index.normal_index + 0],
-						attrib.normals[3 * index.normal_index + 1],
-						attrib.normals[3 * index.normal_index + 2]
-					};
+					if (attrib.normals.size() != 0) {
+						vertex.normal = {
+							attrib.normals[3 * index.normal_index + 0],
+							attrib.normals[3 * index.normal_index + 1],
+							attrib.normals[3 * index.normal_index + 2]
+						};
+					}
 
 					Material material = materials[materialId];
 					SubMesh* subMesh = nullptr;
@@ -90,6 +91,6 @@ namespace FileFormats {
 				}
 				indexOffset += numfaceVerts;
 			}
-		}
+		}	
 	}
 }

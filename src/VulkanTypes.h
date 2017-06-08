@@ -4,6 +4,7 @@
 #include <vulkan/vulkan.h>
 #include "KaiMath.h"
 #include "GfxTypes.h"
+#include "Material.h"
 
 namespace Vulkan {
 	const std::vector<const char*> validationLayers = {
@@ -42,8 +43,23 @@ namespace Vulkan {
 		Vec3 diffuse;
 		Vec3 emissive;
 		Vec3 specular;
+		float reflection;
+		float opacity;
 		float shininess;
-		float alpha;
+		int hasDiffuseTexture;
+		int hasBumpMapTexture;
+		UniformMaterialObject() : reflection(0), opacity(0), shininess(0), hasDiffuseTexture(0), hasBumpMapTexture(0) {}
+
+		UniformMaterialObject(Material material) :
+			ambient(material.ambient),
+			diffuse(material.diffuse),
+			emissive(material.emissive),
+			specular(material.specular),
+			reflection(material.reflection),
+			opacity(material.opacity),
+			shininess(material.shininess),
+			hasDiffuseTexture(material.diffuseTexture == EmptyTextureId ? 0 : 1),
+			hasBumpMapTexture(material.bumpTexture == EmptyTextureId ? 0 : 1) {}
 	};
 
 	struct VkTextureFilter {

@@ -9,10 +9,10 @@
 #include "MeshRenderer.h"
 #include "Camera.h"
 
-const int WIDTH = 800;
-const int HEIGHT = 600;
+const int WIDTH = 1024;
+const int HEIGHT = 768;
 
-const std::string SPONZA_MODEL_NAME = "sponza.obj";
+const std::string SPONZA_MODEL_NAME = "sponza_old.obj";
 const std::string CUBE_MODEL_NAME= "cube.obj";
 
 class App {
@@ -23,7 +23,7 @@ public:
 	~App() { }
 
 	void Run() {
-		GLFWwindow* window = glfwCreateWindow(800, 600, "Kai Engine", nullptr, nullptr);
+		GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Kai Engine", nullptr, nullptr);
 		IRenderer* renderer = new Vulkan::VulkanRenderer(window);
 		Scene* scene = new Scene(renderer);
 
@@ -31,7 +31,7 @@ public:
 		mainCamera->AddComponent<Camera>();
 
 		Camera* cam = mainCamera->GetComponent<Camera>();
-		cam->SetView(lookAt(Vec3(2.0f, 2.0f, 2.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f)));
+		cam->SetView(lookAt(Vec3(1.0f, 1.0f, 1.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f)));
 
 		GameObject* model = new GameObject();
 		model->AddComponent<Transform>();
@@ -52,9 +52,9 @@ public:
 			auto currentTime = std::chrono::high_resolution_clock::now();
 			float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
 
-			Transform* modelTransform = model->GetComponent<Transform>();
+			//Transform* modelTransform = model->GetComponent<Transform>();
 
-			modelTransform->SetRotation(rotate(glm::quat(), time * glm::radians(90.0f), Vec3(0.0f, 0.0f, 1.0f)));			
+			//modelTransform->SetRotation(rotate(glm::quat(), time * glm::radians(90.0f), Vec3(0.0f, 0.0f, 1.0f)));			
 			renderer->PrepareFrame();
 			renderer->PresentFrame();
 		}

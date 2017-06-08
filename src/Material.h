@@ -59,12 +59,13 @@ struct Material {
 			^ std::hash<float>()(opacity) << 1
 			^ std::hash<float>()(shininess) << 1
 			^ diffuseTexture.HashCode() << 1
+			^ bumpTexture.HashCode()
 			/*^ alphaTexture.HashCode() << 1
 			^ ambientTexture.HashCode() << 1
 			
 			^ specularTexture.HashCode() << 1
 			^ specularHighlightTexture.HashCode() << 1
-			^ bumpTexture.HashCode() << 1
+			
 			^ displacementTexture.HashCode()*/
 			) >> 1;
 
