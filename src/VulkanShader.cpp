@@ -1,26 +1,25 @@
 #include "VulkanShader.h"
 #include "VkCom.h"
 #include "Util.h"
-#include "VulkanRenderer.h"
+#include "VulkanRenderSystem.h"
 
 namespace Vulkan
 {
-	VulkanShader::VulkanShader() : pRenderer_(nullptr) {}
+	std::unordered_map<ShaderId, VulkanShader> VulkanShader::shadercache_;
 
-	VulkanShader::VulkanShader(VulkanRenderer* pRenderer) : pRenderer_(pRenderer) {}
+	VulkanShader::VulkanShader() {}
+
+	VulkanShader::~VulkanShader() {}
 
 	void VulkanShader::LoadShaders(ShaderId shaderId) {
-		if (!pRenderer_) {
-			throw std::runtime_error("Vulkan Shader not intialized!");
-		}
+		vertShaderModule_ = { VulkanRenderSystem::Device, vkDestroyShaderModule };
+		fragShaderModule_ = { VulkanRenderSystem::Device, vkDestroyShaderModule };
 
 		auto vertShaderCode = ReadFile(shaderId.GetVertexShader());
 		auto fragShaderCode = ReadFile(shaderId.GetFragmentShader());
 
-		vertShaderModule_ = { pRenderer_->device_, vkDestroyShaderModule };
-		fragShaderModule_ = { pRenderer_->device_, vkDestroyShaderModule };
-		pRenderer_->CreateShaderModule(vertShaderCode, vertShaderModule_);
-		pRenderer_->CreateShaderModule(fragShaderCode, fragShaderModule_);
+		VulkanRenderSystem::CreateShaderModule(vertShaderCode, vertShaderModule_);
+		VulkanRenderSystem::CreateShaderModule(fragShaderCode, fragShaderModule_);
 
 		VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
 		vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -36,5 +35,23 @@ namespace Vulkan
 
 		shaderStages_.push_back(vertShaderStageInfo);
 		shaderStages_.push_back(fragShaderStageInfo);
+	}
+
+	uint32_t VulkanShader::Size() const {
+		return static_cast<uint32_t>(shaderStages_.size());
+	}
+
+	VkPipelineShaderStageCreateInfo* VulkanShader::CreateInfo() {
+		return shaderStages_.data();
+	}
+
+	VulkanShader* VulkanShader::GetShader(ShaderId id) {
+		if (shadercache_.find(id) == end(shadercache_)) {
+			VulkanShader s;
+			shadercache_[id] = s;
+			shadercache_[id].LoadShaders(id);
+		}
+
+		return &shadercache_[id];
 	}
 }

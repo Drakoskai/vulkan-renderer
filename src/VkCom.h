@@ -8,21 +8,15 @@ namespace Vulkan {
 	class VkCom {
 	public:
 		VkCom();
-
 		VkCom(std::function<void(T, VkAllocationCallbacks*)> deletef);
-
 		VkCom(const VkCom<VkInstance>& instance, std::function<void(VkInstance, T, VkAllocationCallbacks*)> deletef);
-
 		VkCom(const VkCom<VkDevice>& device, std::function<void(VkDevice, T, VkAllocationCallbacks*)> deletef);
 
 		~VkCom();
-
+		T& get();
 		const T* operator &() const;
-
 		T* replace();
-
 		operator T() const;
-
 		void operator=(T rhs);
 
 		template<typename V>
@@ -37,7 +31,7 @@ namespace Vulkan {
 
 	template <typename T>
 	VkCom<T>::VkCom() : VkCom([](T, VkAllocationCallbacks*) {
-	}) { }
+	}) {}
 
 	template <typename T>
 	VkCom<T>::VkCom(std::function<void(T, VkAllocationCallbacks*)> deletef) {
@@ -60,6 +54,11 @@ namespace Vulkan {
 	}
 
 	template <typename T>
+	T& VkCom<T>::get() {
+		return object;
+	}
+
+	template <typename T>
 	const T* VkCom<T>::operator&() const {
 		return &object;
 	}
@@ -77,7 +76,7 @@ namespace Vulkan {
 
 	template <typename T>
 	void VkCom<T>::operator=(T rhs) {
-		if(rhs != object) {
+		if (rhs != object) {
 			cleanup();
 			object = rhs;
 		}
@@ -91,7 +90,7 @@ namespace Vulkan {
 
 	template <typename T>
 	void VkCom<T>::cleanup() {
-		if(object != VK_NULL_HANDLE) {
+		if (object != VK_NULL_HANDLE) {
 			deleter(object);
 		}
 		object = VK_NULL_HANDLE;

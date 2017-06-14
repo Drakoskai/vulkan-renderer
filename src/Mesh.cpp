@@ -1,10 +1,8 @@
 #include "Mesh.h"
 #include "ObjFileLoader.h"
-#include "VulkanRenderer.h"
+#include "VulkanRenderSystem.h"
 
-Mesh::Mesh() : nextSubMesh_(0), pRenderer_(nullptr) {}
-
-Mesh::Mesh(Vulkan::VulkanRenderer* renderer) : nextSubMesh_(0), pRenderer_(renderer) {}
+Mesh::Mesh() : nextSubMesh_(0) {}
 
 Mesh::~Mesh() {}
 
@@ -35,7 +33,5 @@ SubMesh* Mesh::AddSubMesh() {
 std::vector<SubMesh>& Mesh::GetSubMeshes() { return subMeshes_; }
 
 void Mesh::Generate() {
-	if (!pRenderer_) { return; }
-	pRenderer_->GetDrawable()->Generate(subMeshes_);
-	pRenderer_->RecreateSwapChain();
+	Vulkan::VulkanRenderSystem::GetDrawable()->Generate(subMeshes_);
 }

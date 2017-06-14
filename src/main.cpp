@@ -3,11 +3,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Util.h"
 #include "GfxTypes.h"
-#include "VulkanRenderer.h"
+#include "VulkanRenderSystem.h"
 #include "Scene.h"
 #include "Transform.h"
 #include "MeshRenderer.h"
 #include "Camera.h"
+#include "Mesh.h"
 
 const int WIDTH = 1024;
 const int HEIGHT = 768;
@@ -24,7 +25,7 @@ public:
 
 	void Run() {
 		GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Kai Engine", nullptr, nullptr);
-		IRenderer* renderer = new Vulkan::VulkanRenderer(window);
+		IRenderer* renderer = new Vulkan::VulkanRenderSystem(window);
 		Scene* scene = new Scene(renderer);
 
 		GameObject* mainCamera = new GameObject();
@@ -38,7 +39,6 @@ public:
 		model->AddComponent<MeshRenderer>();
 		
 		Mesh* mesh = new Mesh();
-		renderer->InitMesh(mesh);
 		mesh->LoadFromFile(CUBE_MODEL_NAME);
 		//mesh->LoadFromFile(SPONZA_MODEL_NAME);
 		MeshRenderer* cubeRenderer = model->GetComponent<MeshRenderer>();

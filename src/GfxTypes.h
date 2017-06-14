@@ -1,5 +1,7 @@
 #ifndef GFX_TYPES_H__
 #define GFX_TYPES_H__
+#include <string>
+#include <cstdint>
 
 enum class ClearFlags : uint32_t { Color = 1 << 0, Depth = 1 << 1, DontClear = 1 << 2 };
 
@@ -23,8 +25,6 @@ enum class FillMode { Solid, Wireframe };
 
 enum class PrimitiveTopology { Triangles, Lines, Patches, Points };
 
-class Mesh;
-
 class __declspec(novtable) IRenderer {
 public:
 	virtual ~IRenderer() {}
@@ -32,7 +32,6 @@ public:
 	virtual void PrepareFrame() = 0;
 	virtual void PresentFrame() = 0;
 	virtual void EndFrame() = 0;
-	virtual void InitMesh(Mesh* mesh) = 0;
 };
 
 static const std::string DefaultVertexShader = "assets/shaders/default_vert.spv";
@@ -151,11 +150,4 @@ namespace std {
 
 static const TextureId EmptyTextureId("textures/empty.png");
 
-struct PipelineContext {
-	BlendMode blendMode;
-	CullMode cullMode;
-	DepthFunction depthFunction;
-	FillMode fillMode;
-	PrimitiveTopology primitiveTopology;
-};
 #endif

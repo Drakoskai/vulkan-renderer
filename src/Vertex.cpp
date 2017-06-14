@@ -1,6 +1,6 @@
 #include "Vertex.h"
 
-VkVertexInputBindingDescription Vertex::GetBindingDescription() const {
+VkVertexInputBindingDescription Vertex::GetBindingDescription() {
 	VkVertexInputBindingDescription bindingDescription = {
 		0,
 		sizeof(Vertex),
@@ -10,7 +10,7 @@ VkVertexInputBindingDescription Vertex::GetBindingDescription() const {
 	return bindingDescription;
 }
 
-std::vector<VkVertexInputAttributeDescription> Vertex::GetAttributeDescriptions() const {
+std::vector<VkVertexInputAttributeDescription> Vertex::GetAttributeDescriptions() {
 	std::vector<VkVertexInputAttributeDescription> attributeDescriptions = std::vector<VkVertexInputAttributeDescription>(3);
 
 	attributeDescriptions[0].binding = 0;

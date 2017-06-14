@@ -2,11 +2,26 @@
 #define VULKAN_TEXTURE_H_
 
 #include <vulkan/vulkan.h>
+#include <unordered_map>
 #include "VkCom.h"
+#include "VulkanTypes.h"
 
 namespace Vulkan {
-	class VulkanRenderer;
-	struct VulkanTexture {
+	class VulkanTexture {
+	public:
+		static VulkanTexture* GetTexture(TextureId textureid);
+
+		VulkanTexture();
+		~VulkanTexture();
+		void Generate();
+		const VkCom<VkImageView>& GetImageView() const;
+		const VkCom<VkSampler>& GetSampler() const;
+		const VkDescriptorImageInfo& GetImageInfo() const;
+	private:
+		void CreateTextureImage();
+		void CreateTextureImageView();
+		void CreateTextureSampler();
+
 		std::string file_;
 		uint32_t mipMapLevels_;
 		uint32_t layerCount_;
@@ -18,16 +33,8 @@ namespace Vulkan {
 		VkCom<VkImageView> textureImageView_;
 		VkCom<VkSampler> textureSampler_;
 		VkDescriptorImageInfo imageInfo_;
-
-		VulkanRenderer* pRenderer_;
-
-		VulkanTexture();
-		explicit VulkanTexture(VulkanRenderer* renderer);
-		void SetRenderDevice(VulkanRenderer* renderer);
-		void Generate();
-		void CreateTextureImage();
-		void CreateTextureImageView();
-		void CreateTextureSampler();
+	
+		static std::unordered_map<TextureId, VulkanTexture> textures_;		
 	};
 }
 #endif

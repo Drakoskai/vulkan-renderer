@@ -75,7 +75,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)thirdparty\vulkan-1.0.49.0\include;$(ProjectDir)thirdparty\include;$(ProjectDir)thirdparty\glfw-3.2.1\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)thirdparty\glfw-3.2.1\lib\x64;$(ProjectDir)thirdparty\vulkan-1.0.49.0\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)thirdparty\glfw-3.2.1\lib\x64;$(ProjectDir)thirdparty\vulkan-1.0.49.0\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -83,7 +83,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(ProjectDir)thirdparty\vulkan-1.0.46.0\inlcude;$(ProjectDir)thirdparty\include;$(ProjectDir)thirdparty\glfw-3.2.1\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)thirdparty\glfw-3.2.1\lib\x64;$(ProjectDir)thirdparty\vulkan-1.0.46.0\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)thirdparty\glfw-3.2.1\lib\x64;$(ProjectDir)thirdparty\vulkan-1.0.46.0\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -166,9 +166,10 @@
     <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\Util.cpp" />
     <ClCompile Include="src\Vertex.cpp" />
+    <ClCompile Include="src\VulkanBuffer.cpp" />
     <ClCompile Include="src\VulkanDrawable.cpp" />
     <ClCompile Include="src\VulkanPipeline.cpp" />
-    <ClCompile Include="src\VulkanRenderer.cpp" />
+    <ClCompile Include="src\VulkanRenderSystem.cpp" />
     <ClCompile Include="src\VulkanShader.cpp" />
     <ClCompile Include="src\VulkanTexture.cpp" />
     <ClCompile Include="src\VulkanTypes.cpp" />
@@ -196,9 +197,10 @@
     <ClInclude Include="src\Util.h" />
     <ClInclude Include="src\Vertex.h" />
     <ClInclude Include="src\VkCom.h" />
+    <ClInclude Include="src\VulkanBuffer.h" />
     <ClInclude Include="src\VulkanDrawable.h" />
     <ClInclude Include="src\VulkanPipeline.h" />
-    <ClInclude Include="src\VulkanRenderer.h" />
+    <ClInclude Include="src\VulkanRenderSystem.h" />
     <ClInclude Include="src\VulkanShader.h" />
     <ClInclude Include="src\VulkanTexture.h" />
     <ClInclude Include="src\VulkanTypes.h" />

@@ -1,26 +1,28 @@
 #include "VulkanPipeline.h"
-#include "VulkanRenderer.h"
-#include "VulkanDrawable.h"
+#include "VulkanRenderSystem.h"
+#include "VulkanTypes.h"
 
 namespace Vulkan {
-	VulkanPipeline::VulkanPipeline() : pRenderer_(nullptr), isGenerated_(false) {}
+	std::unordered_map<size_t, VulkanPipeline> VulkanPipeline::pipelines_;
 
-	VulkanPipeline::VulkanPipeline(VulkanRenderer* renderer) : pRenderer_(renderer), isGenerated_(false) {
-		pipelineLayout_ = { pRenderer_->device_, vkDestroyPipelineLayout };
-		pipeline_ = { pRenderer_->device_, vkDestroyPipeline };
-		descriptorSetLayout_ = { pRenderer_->device_, vkDestroyDescriptorSetLayout };
+	VulkanPipeline* VulkanPipeline::GetPipeline(size_t pipelinehash) {
+		if (pipelines_.find(pipelinehash) == end(pipelines_)) {
+			VulkanPipeline pipeline;
+			pipelines_[pipelinehash] = pipeline;
+		}
+		return &pipelines_[pipelinehash];
 	}
+
+	void VulkanPipeline::DestroyPipelines() {
+		pipelines_.clear();
+	}
+
+	VulkanPipeline::VulkanPipeline() : isGenerated_(false) {}
 
 	VulkanPipeline::~VulkanPipeline() {}
 
-	void VulkanPipeline::SetRenderDevice(VulkanRenderer* renderer) {
-		pRenderer_ = renderer;
-		pipelineLayout_ = { pRenderer_->device_, vkDestroyPipelineLayout };
-		pipeline_ = { pRenderer_->device_, vkDestroyPipeline };
-		descriptorSetLayout_ = { pRenderer_->device_, vkDestroyDescriptorSetLayout };
-	}
-
 	void VulkanPipeline::CreateDescriptorSetLayout() {
+		
 		VkDescriptorSetLayoutBinding uboLayoutBinding;
 		uboLayoutBinding.binding = 0;
 		uboLayoutBinding.descriptorCount = 1;
@@ -42,19 +44,21 @@ namespace Vulkan {
 		normalLayoutBinding.pImmutableSamplers = nullptr;
 		normalLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-
 		std::vector<VkDescriptorSetLayoutBinding> bindings = { uboLayoutBinding, diffuseSamplerLayoutBinding, normalLayoutBinding };
 		VkDescriptorSetLayoutCreateInfo layoutInfo = {};
 		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 		layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
 		layoutInfo.pBindings = bindings.data();
 
-		if (vkCreateDescriptorSetLayout(pRenderer_->device_, &layoutInfo, nullptr, descriptorSetLayout_.replace()) != VK_SUCCESS) {
+		if (vkCreateDescriptorSetLayout(VulkanRenderSystem::Device, &layoutInfo, nullptr, descriptorSetLayout_.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create descriptor set layout!");
 		}
 	}
 
 	void VulkanPipeline::CreatePipeline(const std::vector<VkVertexInputBindingDescription>& bindingDescriptions, const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions, const ShaderId shaderid) {
+		pipelineLayout_ = { VulkanRenderSystem::Device, vkDestroyPipelineLayout };
+		pipeline_ = { VulkanRenderSystem::Device, vkDestroyPipeline };
+		descriptorSetLayout_ = { VulkanRenderSystem::Device, vkDestroyDescriptorSetLayout };
 		CreateDescriptorSetLayout();
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -121,11 +125,10 @@ namespace Vulkan {
 		colorBlending.blendConstants[2] = 0.0f;
 		colorBlending.blendConstants[3] = 0.0f;
 
-		std::array<VkDescriptorSetLayout, 1> layouts = { descriptorSetLayout_ };
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(layouts.size());
-		pipelineLayoutInfo.pSetLayouts = layouts.data();
+		pipelineLayoutInfo.setLayoutCount = 1;
+		pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout_;
 		std::vector<VkPushConstantRange> pushconstatRanges = {
 				VkPushConstantRange {
 					VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -136,14 +139,14 @@ namespace Vulkan {
 		pipelineLayoutInfo.pushConstantRangeCount = static_cast<uint32_t>(pushconstatRanges.size());
 		pipelineLayoutInfo.pPushConstantRanges = pushconstatRanges.data();
 
-		if (vkCreatePipelineLayout(pRenderer_->device_, &pipelineLayoutInfo, nullptr, pipelineLayout_.replace()) != VK_SUCCESS) {
+		if (vkCreatePipelineLayout(VulkanRenderSystem::Device, &pipelineLayoutInfo, nullptr, pipelineLayout_.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create pipeline layout!");
 		}
 
 		VkGraphicsPipelineCreateInfo pipelineInfo = {};
 		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-		pipelineInfo.stageCount = static_cast<uint32_t>(pRenderer_->GetShader(shaderid)->shaderStages_.size());
-		pipelineInfo.pStages = pRenderer_->GetShader(shaderid)->shaderStages_.data();
+		pipelineInfo.stageCount = static_cast<uint32_t>(VulkanShader::GetShader(shaderid)->Size());
+		pipelineInfo.pStages = VulkanShader::GetShader(shaderid)->CreateInfo();
 		pipelineInfo.pVertexInputState = &vertexInputInfo;
 		pipelineInfo.pInputAssemblyState = &inputAssembly;
 		pipelineInfo.pViewportState = &viewportState;
@@ -152,13 +155,13 @@ namespace Vulkan {
 		pipelineInfo.pDepthStencilState = &depthStencil;
 		pipelineInfo.pColorBlendState = &colorBlending;
 		pipelineInfo.layout = pipelineLayout_;
-		pipelineInfo.renderPass = pRenderer_->renderPass_;
+		pipelineInfo.renderPass = VulkanRenderSystem::RenderPass;
 		pipelineInfo.subpass = 0;
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 		pipelineInfo.pDynamicState = &dynamicState;
 
 
-		if (vkCreateGraphicsPipelines(pRenderer_->device_, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, pipeline_.replace()) != VK_SUCCESS) {
+		if (vkCreateGraphicsPipelines(VulkanRenderSystem::Device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, pipeline_.replace()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create graphics pipeline!");
 		}
 		isGenerated_ = true;

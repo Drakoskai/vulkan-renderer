@@ -11,8 +11,8 @@ struct Vertex {
 	Vec2 texCoord;
 	Vec3 normal;
 
-	VkVertexInputBindingDescription GetBindingDescription() const ;
-	std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions() const;
+	static VkVertexInputBindingDescription GetBindingDescription();
+	static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
 
 	bool operator==(const Vertex& other) const;
 };

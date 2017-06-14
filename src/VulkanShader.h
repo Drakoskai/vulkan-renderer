@@ -3,22 +3,27 @@
 
 #include <vulkan/vulkan.h>
 #include <vector>
+#include <unordered_map>
 #include "VkCom.h"
 #include "GfxTypes.h"
 
-namespace Vulkan
-{
-	class VulkanRenderer;
-	struct VulkanShader {
-		VulkanRenderer* pRenderer_;
-		VkCom<VkShaderModule> vertShaderModule_;
-		VkCom<VkShaderModule> fragShaderModule_;
-		std::vector<VkPipelineShaderStageCreateInfo> shaderStages_;
+
+namespace Vulkan {
+	class VulkanShader {
+	public:
+		static VulkanShader* GetShader(ShaderId id);
 
 		VulkanShader();
-		VulkanShader(VulkanRenderer* pRenderer);
-		void SetRenderDevice(VulkanRenderer* renderer) { pRenderer_ = renderer; }
+		~VulkanShader();
 		void LoadShaders(ShaderId shaderId);
+		uint32_t Size() const;
+		VkPipelineShaderStageCreateInfo* CreateInfo();
+	private:
+		static std::unordered_map<ShaderId, VulkanShader> shadercache_;
+
+		VkCom<VkShaderModule> vertShaderModule_;
+		VkCom<VkShaderModule> fragShaderModule_;
+		std::vector<VkPipelineShaderStageCreateInfo> shaderStages_;	
 	};
 }
 #endif

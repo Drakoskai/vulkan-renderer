@@ -8,7 +8,6 @@
 #include "SubMesh.h"
 
 namespace Vulkan {
-	class VulkanRenderer;
 
 	struct VertexBufferSection {
 		VkBuffer buffer = VK_NULL_HANDLE;
@@ -26,7 +25,6 @@ namespace Vulkan {
 	public:
 		VulkanVertexBuffer();
 		~VulkanVertexBuffer();
-		void SetRenderer(VulkanRenderer* renderer);
 		void AddGeometry(const SubMesh& group, VulkanPipeline* pipeline);
 		void Generate();
 		const VkCom<VkBuffer>& GetVertexBuffer() const { return vertexBuffer_; }
@@ -44,7 +42,6 @@ namespace Vulkan {
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions_;
 		std::vector<VkVertexInputBindingDescription> bindingDescriptions_;
 		std::vector<std::pair<SubMesh, VulkanPipeline*>> geometries_;
-		VulkanRenderer* pRenderer_;
 	};
 }
 #endif

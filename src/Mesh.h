@@ -8,9 +8,7 @@
 class Mesh {
 public:
 	Mesh();
-	Mesh(Vulkan::VulkanRenderer* renderer);
 	~Mesh();
-	void SetRenderDevice(Vulkan::VulkanRenderer* renderer) { pRenderer_ = renderer; }
 	void LoadFromFile(const std::string& filename);
 	size_t GetSubMeshCount() const;
 	const std::string& GetSubMeshName(uint32_t index) const;
@@ -20,9 +18,7 @@ public:
 
 private:
 	friend class MeshRenderer;
-
 	std::vector<SubMesh> subMeshes_;
 	uint32_t nextSubMesh_;
-	Vulkan::VulkanRenderer* pRenderer_;
 };
 #endif
