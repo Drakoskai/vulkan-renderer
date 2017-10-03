@@ -35,12 +35,12 @@ namespace FileFormats {
 			/*materials[i].displacementTexture =  mats[i].displacement_texname == "" ? EmptyTextureId :  mats[i].displacement_texname;
 			materials[i].specularTexture =  mats[i].specular_texname == "" ? EmptyTextureId :  mats[i].specular_texname;
 			materials[i].specularHighlightTexture =  mats[i].specular_highlight_texname == "" ? EmptyTextureId :  mats[i].specular_highlight_texname;*/
-
-			if (mats[i].illum == 2) {
+			materials[i].shader = DefaultUnlitShader;
+			/*if (mats[i].illum == 2) {
 				materials[i].shader = DefaultLightShader;
 			} else {
 				materials[i].shader = DefaultUnlitShader;
-			}
+			}*/
 		}
 
 		std::unordered_map<Vertex, int32_t> uniqueVertices = {};

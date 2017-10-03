@@ -1,0 +1,10 @@
+uniforms [
+	position
+	texCoord
+	normal
+	viewVec
+	lightVec
+]
+bindings [
+	ubo
+]

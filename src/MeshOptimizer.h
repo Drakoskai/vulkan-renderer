@@ -1,5 +1,5 @@
-#ifndef MESH_OPTIMIZER_H__
-#define MESH_OPTIMIZER_H__
+#ifndef MESH_OPTIMIZER_H_
+#define MESH_OPTIMIZER_H_
 
 #include <cstdint>
 #include <cmath>

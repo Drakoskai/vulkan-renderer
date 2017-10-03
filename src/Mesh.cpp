@@ -10,8 +10,8 @@ void Mesh::LoadFromFile(const std::string& filename) {
 	FileFormats::LoadObjFile(filename, *this);
 }
 
-size_t Mesh::GetSubMeshCount() const {
-	return subMeshes_.size();
+uint32_t Mesh::GetSubMeshCount() const {
+	return static_cast<uint32_t>(subMeshes_.size());
 }
 
 const std::string& Mesh::GetSubMeshName(uint32_t index) const {
@@ -20,11 +20,11 @@ const std::string& Mesh::GetSubMeshName(uint32_t index) const {
 
 SubMesh* Mesh::AddSubMesh() {
 	if (nextSubMesh_ == subMeshes_.size()) {
-		size_t size = subMeshes_.size();
+		const uint32_t size = static_cast<uint32_t>(subMeshes_.size());
 		subMeshes_.resize(size + 1);
 	}
 
-	auto subMesh = &subMeshes_[nextSubMesh_];
+	const auto subMesh = &subMeshes_[nextSubMesh_];
 	nextSubMesh_++;
 
 	return subMesh;
@@ -33,5 +33,5 @@ SubMesh* Mesh::AddSubMesh() {
 std::vector<SubMesh>& Mesh::GetSubMeshes() { return subMeshes_; }
 
 void Mesh::Generate() {
-	Vulkan::VulkanRenderSystem::GetDrawable()->Generate(subMeshes_);
+	
 }

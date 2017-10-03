@@ -22,7 +22,7 @@
     <ProjectGuid>{9C464689-2286-473C-929B-5522C18DDFDC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>VulkanRenderer</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -71,19 +71,21 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)thirdparty\spirv-cross\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)thirdparty\vulkan-1.0.49.0\include;$(ProjectDir)thirdparty\include;$(ProjectDir)thirdparty\glfw-3.2.1\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)thirdparty\glfw-3.2.1\lib\x64;$(ProjectDir)thirdparty\vulkan-1.0.49.0\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)thirdparty\spirv-cross\include;$(ProjectDir)thirdparty\vulkan\include;$(ProjectDir)thirdparty\include;$(ProjectDir)thirdparty\glfw-3.2.1\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)thirdparty\spirv-cross\lib;$(ProjectDir)thirdparty\glfw-3.2.1\lib\x64;$(ProjectDir)thirdparty\vulkan\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)thirdparty\spirv-cross\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)thirdparty\vulkan-1.0.46.0\inlcude;$(ProjectDir)thirdparty\include;$(ProjectDir)thirdparty\glfw-3.2.1\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)thirdparty\glfw-3.2.1\lib\x64;$(ProjectDir)thirdparty\vulkan-1.0.46.0\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)thirdparty\spirv-cross\include;$(ProjectDir)thirdparty\vulkan-1.0.46.0\inlcude;$(ProjectDir)thirdparty\include;$(ProjectDir)thirdparty\glfw-3.2.1\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)thirdparty\spirv-cross\lib;$(ProjectDir)thirdparty\glfw-3.2.1\lib\x64;$(ProjectDir)thirdparty\vulkan-1.0.46.0\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -91,7 +93,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -104,14 +106,20 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OmitFramePointers>false</OmitFramePointers>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;SPIRV-Cross.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup </AdditionalOptions>
+      <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -122,7 +130,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,14 +147,14 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;vulkan-1.lib;SPIRV-Cross.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -166,15 +174,19 @@
     <ClCompile Include="src\Transform.cpp" />
     <ClCompile Include="src\Util.cpp" />
     <ClCompile Include="src\Vertex.cpp" />
+    <ClCompile Include="src\VulkanAllocation.cpp" />
+    <ClCompile Include="src\VulkanAllocator.cpp" />
     <ClCompile Include="src\VulkanBuffer.cpp" />
+    <ClCompile Include="src\VulkanBufferStaging.cpp" />
     <ClCompile Include="src\VulkanDrawable.cpp" />
-    <ClCompile Include="src\VulkanPipeline.cpp" />
+    <ClCompile Include="src\VulkanInit.cpp" />
+    <ClCompile Include="src\VulkanMemoryBlock.cpp" />
+    <ClCompile Include="src\VulkanRenderProgram.cpp" />
     <ClCompile Include="src\VulkanRenderSystem.cpp" />
     <ClCompile Include="src\VulkanShader.cpp" />
     <ClCompile Include="src\VulkanTexture.cpp" />
     <ClCompile Include="src\VulkanTypes.cpp" />
     <ClCompile Include="src\VulkanUtil.cpp" />
-    <ClCompile Include="src\VulkanVertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
@@ -196,16 +208,19 @@
     <ClInclude Include="src\Transform.h" />
     <ClInclude Include="src\Util.h" />
     <ClInclude Include="src\Vertex.h" />
-    <ClInclude Include="src\VkCom.h" />
+    <ClInclude Include="src\VulkanAllocation.h" />
+    <ClInclude Include="src\VulkanAllocator.h" />
     <ClInclude Include="src\VulkanBuffer.h" />
+    <ClInclude Include="src\VulkanBufferStaging.h" />
     <ClInclude Include="src\VulkanDrawable.h" />
-    <ClInclude Include="src\VulkanPipeline.h" />
+    <ClInclude Include="src\VulkanInit.h" />
+    <ClInclude Include="src\VulkanMemoryBlock.h" />
+    <ClInclude Include="src\VulkanRenderProgram.h" />
     <ClInclude Include="src\VulkanRenderSystem.h" />
     <ClInclude Include="src\VulkanShader.h" />
     <ClInclude Include="src\VulkanTexture.h" />
     <ClInclude Include="src\VulkanTypes.h" />
     <ClInclude Include="src\VulkanUtil.h" />
-    <ClInclude Include="src\VulkanVertexBuffer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

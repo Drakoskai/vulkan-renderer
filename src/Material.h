@@ -1,12 +1,12 @@
-#ifndef MATERIAL_H__
-#define MATERIAL_H__
+#ifndef MATERIAL_H_
+#define MATERIAL_H_
 
-#include "Vertex.h"
-#include "GfxTypes.h"
 #include <unordered_map>
+#include "KaiMath.h"
+#include "GfxTypes.h"
 
 struct Material {
-	static std::unordered_map<size_t, Material> materials;
+	static std::unordered_map<uint64_t, Material> materials;
 	std::string name;
 	Vec3 ambient;
 	Vec3 diffuse;
@@ -24,35 +24,8 @@ struct Material {
 	TextureId displacementTexture;
 	ShaderId shader;
 
-	uint32_t GetNumberOfTextures() const {
-		TextureId empty;
-		uint32_t numTextures = 0;
-		if (alphaTexture != empty) {
-			numTextures++;
-		}
-		if (ambientTexture != empty) {
-			numTextures++;
-		}
-		if (diffuseTexture != empty) {
-			numTextures++;
-		}
-		if (specularTexture != empty) {
-			numTextures++;
-		}
-		if (specularHighlightTexture != empty) {
-			numTextures++;
-		}
-		if (bumpTexture != empty) {
-			numTextures++;
-		}
-		if (displacementTexture != empty) {
-			numTextures++;
-		}
-		return numTextures;
-	}
-
-	size_t HashCode() const {
-		size_t nameHash = (std::hash<std::string>()(name) ^
+	uint64_t HashCode() const {
+		const uint64_t nameHash = (std::hash<std::string>()(name) ^
 			std::hash<glm::vec3>()(ambient) << 1
 			^ std::hash<glm::vec3>()(diffuse) << 1
 			^ std::hash<glm::vec3>()(emissive) << 1
@@ -60,16 +33,7 @@ struct Material {
 			^ std::hash<float>()(reflection) << 1
 			^ std::hash<float>()(opacity) << 1
 			^ std::hash<float>()(shininess) << 1
-			^ diffuseTexture.HashCode() << 1
-			^ bumpTexture.HashCode()
-			/*^ alphaTexture.HashCode() << 1
-			^ ambientTexture.HashCode() << 1
-			
-			^ specularTexture.HashCode() << 1
-			^ specularHighlightTexture.HashCode() << 1
-			
-			^ displacementTexture.HashCode()*/
-			) >> 1;
+			^ diffuseTexture.HashCode()) >> 1;
 
 		return nameHash;
 	}
@@ -86,4 +50,25 @@ namespace std {
 		}
 	};
 }
+
+struct UniformMaterialObject {
+	Vec3 ambient;
+	Vec3 diffuse;
+	Vec3 emissive;
+	Vec3 specular;
+	float reflection;
+	float opacity;
+	float shininess;
+	UniformMaterialObject() : reflection(0), opacity(0), shininess(0) {}
+
+	UniformMaterialObject(Material material) :
+		ambient(material.ambient),
+		diffuse(material.diffuse),
+		emissive(material.emissive),
+		specular(material.specular),
+		reflection(material.reflection),
+		opacity(material.opacity),
+		shininess(material.shininess) {}
+};
+
 #endif

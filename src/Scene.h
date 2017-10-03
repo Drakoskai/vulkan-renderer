@@ -1,5 +1,5 @@
-#ifndef SCENE_H__
-#define SCENE_H__
+#ifndef SCENE_H_
+#define SCENE_H_
 
 #include <vector>
 #include "GameObject.h"

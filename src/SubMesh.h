@@ -1,5 +1,5 @@
-#ifndef SUB_MESH_H__
-#define SUB_MESH_H__
+#ifndef SUB_MESH_H_
+#define SUB_MESH_H_
 
 #include "Vertex.h"
 #include "Material.h"

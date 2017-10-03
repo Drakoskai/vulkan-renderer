@@ -1,5 +1,5 @@
-#ifndef OBJ_FILE_LOADER_H__
-#define OBJ_FILE_LOADER_H__
+#ifndef OBJ_FILE_LOADER_H_
+#define OBJ_FILE_LOADER_H_
 
 #include "Mesh.h"
 

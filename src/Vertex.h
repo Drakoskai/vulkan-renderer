@@ -1,17 +1,21 @@
-#ifndef VERTEX_H__
-#define VERTEX_H__
+#ifndef VERTEX_H_
+#define VERTEX_H_
 
+#include <vulkan/vulkan.h>
 #include <array>
 #include <vector>
 #include "KaiMath.h"
-#include "VkCom.h"
+
+enum VertexType {
+	DrawVertex
+};
 
 struct Vertex {
 	Vec3 position;
 	Vec2 texCoord;
 	Vec3 normal;
 
-	static VkVertexInputBindingDescription GetBindingDescription();
+	static std::vector<VkVertexInputBindingDescription> GetBindingDescription();
 	static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
 
 	bool operator==(const Vertex& other) const;

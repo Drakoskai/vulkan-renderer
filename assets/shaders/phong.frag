@@ -3,17 +3,9 @@
 #extension GL_ARB_separate_shader_objects : enable
 #extension GL_ARB_shading_language_420pack : enable
 
-layout(binding = 1) uniform sampler2D diffSampler;
-layout(binding = 2) uniform sampler2D normSampler;
+layout(binding = 1) uniform sampler2D sampler;
 
-in FromVert{
-  vec2 inTexCoord;
-  vec3 inNormal;
-  vec3 inViewVec;
-  vec3 inLightVec;
-} fromVert;
-
-layout(push_constant) uniform Material {
+layout(binding = 2) uniform Material {
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 emissive;
@@ -21,9 +13,12 @@ layout(push_constant) uniform Material {
 	float reflection;
 	float opacity;
 	float shininess;
-	int hasDiffuseTexture;
-	int hasBumpMapTexture;
 } material;
+
+layout(location = 0) in vec2 inTexCoord;
+layout(location = 1) in vec3 inNormal;
+layout(location = 2) in vec3 inViewVec;
+layout(location = 3) in vec3 inLightVec;
 
 layout(location = 0) out vec4 outColor;
 
@@ -35,20 +30,14 @@ vec3 applyNormalMap(vec3 normal, vec3 normSample){
     return normalize(normSample.y * surftan + normSample.x * surfbinor + normSample.z * normal);
 }
 
-void main() {	
-	vec3 N;
-	if(material.hasBumpMapTexture == 1){
-		N = applyNormalMap(fromVert.inNormal, texture(normSampler, fromVert.inTexCoord).rgb);
-	} else {
-		N = normalize(fromVert.inNormal);
-	}
-	
-	vec3 L = normalize(fromVert.inLightVec);
-	vec3 V = normalize(fromVert.inViewVec);
+void main() {			
+	vec3 N = normalize(inNormal);
+	vec3 L = normalize(inLightVec);
+	vec3 V = normalize(inViewVec);
 		
 	vec3 ambient = material.ambient;
 	vec4 color;
-	color = texture(diffSampler, fromVert.inTexCoord);	
+	color = texture(sampler, inTexCoord);	
 	if ((color.r >= 0.9) || (color.g >= 0.9) || (color.b >= 0.9)) {
 		ambient *= color.rgb * 0.25;
 	} else {

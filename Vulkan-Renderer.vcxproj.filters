@@ -90,25 +90,37 @@
     <ClCompile Include="src\SubMesh.cpp">
       <Filter>Source Files\Render</Filter>
     </ClCompile>
-    <ClCompile Include="src\VulkanPipeline.cpp">
-      <Filter>Source Files\Render\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VulkanShader.cpp">
-      <Filter>Source Files\Render\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\VulkanTexture.cpp">
       <Filter>Source Files\Render\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\PointLight.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="src\VulkanVertexBuffer.cpp">
-      <Filter>Source Files\Render\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\VulkanRenderSystem.cpp">
       <Filter>Source Files\Render\Vulkan</Filter>
     </ClCompile>
     <ClCompile Include="src\VulkanBuffer.cpp">
+      <Filter>Source Files\Render\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VulkanRenderProgram.cpp">
+      <Filter>Source Files\Render\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VulkanBufferStaging.cpp">
+      <Filter>Source Files\Render\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VulkanAllocation.cpp">
+      <Filter>Source Files\Render\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VulkanMemoryBlock.cpp">
+      <Filter>Source Files\Render\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VulkanAllocator.cpp">
+      <Filter>Source Files\Render\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VulkanShader.cpp">
+      <Filter>Source Files\Render\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VulkanInit.cpp">
       <Filter>Source Files\Render\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>
@@ -161,9 +173,6 @@
     <ClInclude Include="src\VulkanUtil.h">
       <Filter>Header Files\Render\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="src\VkCom.h">
-      <Filter>Header Files\Render\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="src\VulkanTypes.h">
       <Filter>Header Files\Render\Vulkan</Filter>
     </ClInclude>
@@ -179,16 +188,7 @@
     <ClInclude Include="src\VulkanDrawable.h">
       <Filter>Header Files\Render\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="src\VulkanPipeline.h">
-      <Filter>Header Files\Render\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VulkanShader.h">
-      <Filter>Header Files\Render\Vulkan</Filter>
-    </ClInclude>
     <ClInclude Include="src\VulkanTexture.h">
-      <Filter>Header Files\Render\Vulkan</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VulkanVertexBuffer.h">
       <Filter>Header Files\Render\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="src\GfxTypes.h">
@@ -197,7 +197,28 @@
     <ClInclude Include="src\VulkanRenderSystem.h">
       <Filter>Header Files\Render\Vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="src\VulkanRenderProgram.h">
+      <Filter>Header Files\Render\Vulkan</Filter>
+    </ClInclude>
     <ClInclude Include="src\VulkanBuffer.h">
+      <Filter>Header Files\Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VulkanBufferStaging.h">
+      <Filter>Header Files\Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VulkanMemoryBlock.h">
+      <Filter>Header Files\Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VulkanAllocation.h">
+      <Filter>Header Files\Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VulkanAllocator.h">
+      <Filter>Header Files\Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VulkanShader.h">
+      <Filter>Header Files\Render\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VulkanInit.h">
       <Filter>Header Files\Render\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>

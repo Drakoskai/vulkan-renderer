@@ -3,7 +3,6 @@
 
 #include <vulkan/vulkan.h>
 #include <unordered_map>
-#include "VkCom.h"
 #include "VulkanTypes.h"
 
 namespace Vulkan {
@@ -14,27 +13,27 @@ namespace Vulkan {
 		VulkanTexture();
 		~VulkanTexture();
 		void Generate();
-		const VkCom<VkImageView>& GetImageView() const;
-		const VkCom<VkSampler>& GetSampler() const;
-		const VkDescriptorImageInfo& GetImageInfo() const;
+		VkImageView GetImageView() const;
+		VkSampler GetSampler() const;
+		VkDescriptorImageInfo GetImageInfo() const;
 	private:
 		void CreateTextureImage();
 		void CreateTextureImageView();
 		void CreateTextureSampler();
 
-		std::string file_;
-		uint32_t mipMapLevels_;
-		uint32_t layerCount_;
-		uint32_t textureWidth_;
-		uint32_t textureHeight_;
+		std::string mFile;
+		uint32_t mMipMapLevels;
+		uint32_t mLayerCount;
+		uint32_t mTextureWidth;
+		uint32_t mTextureHeight;
 
-		VkCom<VkImage> textureImage_;
-		VkCom<VkDeviceMemory> textureImageMemory_;
-		VkCom<VkImageView> textureImageView_;
-		VkCom<VkSampler> textureSampler_;
-		VkDescriptorImageInfo imageInfo_;
+		VkImage hTextureImage = VK_NULL_HANDLE;
+		VkDeviceMemory hTextureImageMemory = VK_NULL_HANDLE;
+		VkImageView hTextureImageView = VK_NULL_HANDLE;
+		VkSampler hTextureSampler = VK_NULL_HANDLE;
+		VkDescriptorImageInfo mImageInfo;
 	
-		static std::unordered_map<TextureId, VulkanTexture> textures_;		
+		static std::unordered_map<TextureId, VulkanTexture> Textures;		
 	};
 }
 #endif

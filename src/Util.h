@@ -1,17 +1,22 @@
-#ifndef UTIL_H__
-#define UTIL_H__
-
-#include <functional>
+#ifndef UTIL_H_
+#define UTIL_H_
+#include "stdafx.h"
 #include <vector>
-#include <fstream>
 
 const std::string MODELS_PATH = "assets/models/";
 const std::string MATERIALS_PATH = "assets/materials/";
 const std::string TEXTURES_PATH = "assets/";
 
+template< typename T >
+void SwapValues(T & a, T & b) {
+	T c = a;
+	a = b;
+	b = c;
+}
+
 template<typename T>
 void SafeDelete(T* ptr) {
-	if(ptr) {
+	if (ptr) {
 		delete ptr;
 		ptr = nullptr;
 	}
@@ -19,30 +24,22 @@ void SafeDelete(T* ptr) {
 
 template<typename T>
 void SafeDeleteArr(T* ar) {
-	if(ar) {
+	if (ar) {
 		delete[] ar;
 		ar = nullptr;
 	}
 }
 
-static std::vector<char> ReadFile(const std::string& filename) {
-	std::ifstream file(filename, std::ios::ate | std::ios::binary);
+std::vector<uint32_t> ReadFileInts(const std::string& filename);
 
-	if(!file.is_open()) {
-		throw std::runtime_error("failed to open file!");
-	}
-	size_t fileSize = static_cast<size_t>(file.tellg());
-	std::vector<char> buffer(fileSize);
-	file.seekg(0);
-	file.read(buffer.data(), fileSize);
-	file.close();
-
-	return buffer;
-}
+std::vector<char> ReadFile(const std::string& filename);
 
 std::wstring StringToWString(const std::string& s);
 
 int VDebugPrintF(const char* format, va_list argList);
 
 int DebugPrintF(const char* format, ...);
+
+int DebugPrintFIf(bool test, const char* format, ...);
+
 #endif
