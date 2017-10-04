@@ -24,9 +24,12 @@ namespace Vulkan {
 		~VulkanRenderSystem();
 
 		void Init() override;
+		void CleanupSwapChain();
 		void Shutdown();
 		void PrepareFrame() override;
 		void StartFrame();
+		void SwapBuffers();
+		void DrawFrame();
 		void PresentFrame() override;
 		void EndFrame() override;
 		void RecreateSwapChain();
@@ -64,15 +67,16 @@ namespace Vulkan {
 		std::vector<VkImageView> swapChainImageViews_;
 		std::vector<VkFramebuffer> swapChainFramebuffers_;
 
-		VkSemaphore imageAvailableSemaphore_ = VK_NULL_HANDLE;
-		VkSemaphore renderFinishedSemaphore_ = VK_NULL_HANDLE;
+		std::array<VkSemaphore, NumberOfFrameBuffers> mImageAvailableSemaphores;
+		std::array<VkSemaphore, NumberOfFrameBuffers> mRenderFinishedSemaphore;
 
 		std::vector<const char*> instanceExtensions;
 		std::vector<const char*> deviceExtensions;
 		std::vector<const char*> validationLayers;
 
-		VulkanGpuProgramState gpuProgram;
-		uint32_t currentSwapImage;
+		VulkanGpuProgramState GpuProgramState;
+		uint32_t mCurrentSwapImage;
+		uint64_t mPipelineState;
 	};
 }
 #endif

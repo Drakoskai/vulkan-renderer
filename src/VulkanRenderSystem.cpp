@@ -6,8 +6,13 @@
 #include "VulkanInit.h"
 #include "VulkanBufferStaging.h"
 #include "VulkanAllocator.h"
+#include "Camera.h"
+#include "Transform.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace Vulkan {
+
 	VkInstance VulkanRenderSystem::Instance = VK_NULL_HANDLE;
 	VkSurfaceKHR VulkanRenderSystem::Surface = VK_NULL_HANDLE;
 	VkFormat VulkanRenderSystem::SwapChainImageFormat;
@@ -17,13 +22,14 @@ namespace Vulkan {
 	VulkanContext context;
 	VulkanAllocator Allocator;
 
-	VulkanRenderSystem::VulkanRenderSystem(GLFWwindow* window) : currentSwapImage(0) {
+	VulkanRenderSystem::VulkanRenderSystem(GLFWwindow* window) : mCurrentSwapImage(0), mPipelineState(0) {
 		pGLFWwindow = window;
 	}
 
-	VulkanRenderSystem::~VulkanRenderSystem() {}
+	VulkanRenderSystem::~VulkanRenderSystem() { Shutdown(); }
 
 	void VulkanRenderSystem::Init() {
+		mPipelineState = GetDefaultPipelineState();
 		CreateInstance();
 		SetupDebugCallback();
 		CreateSurface();
@@ -31,7 +37,7 @@ namespace Vulkan {
 		CreateLogicalDevice();
 		Allocator.Init();
 		Staging.Init();
-		gpuProgram.Init();
+		GpuProgramState.Init();
 		CreateSwapChain();
 		CreateImageViews();
 		CreateRenderPass();
@@ -44,21 +50,14 @@ namespace Vulkan {
 
 	void VulkanRenderSystem::Shutdown() {
 		vkDeviceWaitIdle(context.device);
-		vkDestroySemaphore(context.device, renderFinishedSemaphore_, nullptr);
-		vkDestroySemaphore(context.device, imageAvailableSemaphore_, nullptr);
-		for (VkFramebuffer framebuffer : swapChainFramebuffers_) {
-			vkDestroyFramebuffer(context.device, framebuffer, nullptr);
+		CleanupSwapChain();
+
+		for (auto i = 0; i < NumberOfFrameBuffers; i++) {
+			vkDestroySemaphore(context.device, mImageAvailableSemaphores[i], nullptr);
+			vkDestroySemaphore(context.device, mRenderFinishedSemaphore[i], nullptr);
 		}
-		swapChainFramebuffers_.clear();
-		vkDestroyImageView(context.device, depthImageView_, nullptr);
-		vkFreeMemory(context.device, depthImageMemory_, nullptr);
-		vkDestroyImage(context.device, depthImage_, nullptr);
-		vkDestroyRenderPass(context.device, context.renderPass, nullptr);
-		for (VkImageView imageView : swapChainImageViews_) {
-			vkDestroyImageView(context.device, imageView, nullptr);
-		}
-		vkDestroySwapchainKHR(context.device, SwapChain, nullptr);
-		gpuProgram.Shutdown();
+		
+		GpuProgramState.Shutdown();
 		Staging.Shutdown();
 		Allocator.Shutdown();
 		vkDestroyDevice(context.device, nullptr);
@@ -67,9 +66,27 @@ namespace Vulkan {
 		vkDestroyInstance(Instance, nullptr);
 	}
 
+	void VulkanRenderSystem::CleanupSwapChain() {
+		vkDestroyImageView(context.device, depthImageView_, nullptr);
+		vkDestroyImage(context.device, depthImage_, nullptr);
+		vkFreeMemory(context.device, depthImageMemory_, nullptr);
+
+		for (auto i = 0; i < swapChainFramebuffers_.size(); i++) {
+			vkDestroyFramebuffer(context.device, swapChainFramebuffers_[i], nullptr);
+		}
+
+		vkFreeCommandBuffers(context.device, context.commandPool, static_cast<uint32_t>(context.commandBuffers.size()), context.commandBuffers.data());
+		vkDestroyRenderPass(context.device, context.renderPass, nullptr);
+
+		for (auto i = 0; i < swapChainImageViews_.size(); i++) {
+			vkDestroyImageView(context.device, swapChainImageViews_[i], nullptr);
+		}
+
+		vkDestroySwapchainKHR(context.device, SwapChain, nullptr);
+	}
+
 	void VulkanRenderSystem::PrepareFrame() {
-		RecreateSwapChain();
-		/*Transform::UpdateLocalMatrices();
+		Transform::UpdateLocalMatrices();
 		Camera::GetCameras()[0].SetProjection(glm::perspective(glm::radians(45.0f), SwapChainExtent.width / static_cast<float>(SwapChainExtent.height), 0.1f, 10.0f));
 
 		UniformBufferObject ubo;
@@ -78,20 +95,20 @@ namespace Vulkan {
 		Matrix proj = Camera::GetCameras()[0].GetProj();
 		proj[1][1] *= -1;
 
-		void* data;
 		ubo.model = model;
 		ubo.view = view;
 		ubo.proj = proj;
 		ubo.world = Matrix(1.0);
-		ubo.lightpos = Vec3(2.0f, 2.0f, 8.0f);*/
+		ubo.lightpos = Vec3(2.0f, 2.0f, 8.0f);
+		std::array<UniformBufferObject, 1> uniforms = { ubo };
 
-
-		//gpuProgram.SetUniformData(0, data);
-		//gpuProgram.Commit()
+		GpuProgramState.SetUniformData(context.currentFrame, uniforms.data());		
 	}
 
 	void VulkanRenderSystem::StartFrame() {
-		/*VkResult result = vkAcquireNextImageKHR(context.device, SwapChain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphore_, VK_NULL_HANDLE, &currentSwapImage);
+		const uint32_t currentFrame = context.currentFrame;
+		context.commandBuffer = context.commandBuffers[currentFrame];
+		const VkResult result = vkAcquireNextImageKHR(context.device, SwapChain, UINT64_MAX, mImageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &mCurrentSwapImage);
 		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
 			RecreateSwapChain();
 			return;
@@ -100,47 +117,61 @@ namespace Vulkan {
 		if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
 			throw std::runtime_error("failed to acquire swap chain image!");
 		}
+		Allocator.EmptyGarbage();
+		Staging.Flush();
+		GpuProgramState.Start();
+	}
 
-		gpuProgram.Start();
+	void VulkanRenderSystem::SwapBuffers() {
+		const uint32_t currentFrame = context.currentFrame;
 		VkSubmitInfo submitInfo = {};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-		VkSemaphore waitSemaphores[] = { imageAvailableSemaphore_ };
+		VkSemaphore waitSemaphores[] = { mImageAvailableSemaphores[currentFrame] };
 		VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
 		submitInfo.pWaitDstStageMask = waitStages;
 		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &PrimaryCommandBuffer[0];// &PrimaryCommandBuffer[imageIndex];
+		submitInfo.pCommandBuffers = &context.commandBuffer;
 
-		VkSemaphore signalSemaphores[] = { renderFinishedSemaphore_ };
+		VkSemaphore signalSemaphores[] = { mRenderFinishedSemaphore[context.currentFrame] };
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
 		if (vkQueueSubmit(context.graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS) {
 			throw std::runtime_error("failed to submit draw command buffer!");
-		}*/
+		}
 
-	}
-
-	void VulkanRenderSystem::PresentFrame() {
-		/*VkPresentInfoKHR presentInfo = {};
+		VkPresentInfoKHR presentInfo = {};
 		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 		presentInfo.waitSemaphoreCount = 1;
-		//presentInfo.pWaitSemaphores = signalSemaphores;
+		presentInfo.pWaitSemaphores = signalSemaphores;
 
 		VkSwapchainKHR swapChains[] = { SwapChain };
 		presentInfo.swapchainCount = 1;
 		presentInfo.pSwapchains = swapChains;
-		//presentInfo.pImageIndices = &imageIndex;
+		presentInfo.pImageIndices = &mCurrentSwapImage;
 
-		VkResult result = vkQueuePresentKHR(PresentQueue, &presentInfo);
-
+		VkResult result = vkQueuePresentKHR(context.presentQueue, &presentInfo);
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
 			RecreateSwapChain();
 		} else if (result != VK_SUCCESS) {
 			throw std::runtime_error("failed to present swap chain image!");
-		}*/
+		}
+
+		vkQueueWaitIdle(context.presentQueue);
+		context.counter++;
+		context.currentFrame = context.counter % NumberOfFrameBuffers;
+	}
+
+	void VulkanRenderSystem::DrawFrame() {
+		const VulkanRenderProgram& renderProgram = GpuProgramState.GetCurrentRenderProg();
+		GpuProgramState.Commit(mPipelineState);
+	}
+
+	void VulkanRenderSystem::PresentFrame() {
+		DrawFrame();
+		SwapBuffers();
 	}
 
 	void VulkanRenderSystem::EndFrame() {}
@@ -208,6 +239,7 @@ namespace Vulkan {
 
 	void VulkanRenderSystem::RecreateSwapChain() {
 		vkDeviceWaitIdle(context.device);
+		CleanupSwapChain();
 		CreateSwapChain();
 		CreateImageViews();
 		CreateRenderPass();
@@ -243,8 +275,7 @@ namespace Vulkan {
 		} else {
 			createInfo.enabledLayerCount = 0;
 		}
-		const VkResult res = vkCreateInstance(&createInfo, nullptr, &Instance);
-		VkCheckOrThrow(res, "failed to create instance!");
+		VkCheckOrThrow(vkCreateInstance(&createInfo, nullptr, &Instance), "failed to create instance!");
 	}
 
 	void VulkanRenderSystem::SetupDebugCallback() {
@@ -254,8 +285,7 @@ namespace Vulkan {
 	}
 
 	void VulkanRenderSystem::CreateSurface() {
-		const VkResult res = glfwCreateWindowSurface(Instance, pGLFWwindow, nullptr, &Surface);
-		VkCheckOrThrow(res, "failed to create window surface!");
+		VkCheckOrThrow(glfwCreateWindowSurface(Instance, pGLFWwindow, nullptr, &Surface), "failed to create window surface!");
 	}
 
 	void VulkanRenderSystem::PickPhysicalDevice() {
@@ -311,9 +341,6 @@ namespace Vulkan {
 				context.graphicsFamilyIdx = graphicsIdx;
 				context.presentFamilyIdx = presentIdx;
 				context.gpu = &gpu;
-
-
-
 				return;
 			}
 		}
@@ -529,7 +556,6 @@ namespace Vulkan {
 			vkFreeCommandBuffers(context.device, context.commandPool, static_cast<uint32_t>(context.commandBuffers.size()), context.commandBuffers.data());
 		}
 
-		context.commandBuffers.resize(swapChainFramebuffers_.size());
 		VkCommandBufferAllocateInfo allocInfo = {};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 		allocInfo.commandPool = context.commandPool;
@@ -581,13 +607,20 @@ namespace Vulkan {
 		}
 	}
 
-	void VulkanRenderSystem::CreateSemaphores() {
+	void CreateSemaphore(VkSemaphore& semaphore) {
 		VkSemaphoreCreateInfo semaphoreInfo = {};
 		semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+		VkCheckOrThrow(vkCreateSemaphore(context.device, &semaphoreInfo, nullptr, &semaphore), "failed to create semaphore!");
+	}
 
-		if (!VkCheck(vkCreateSemaphore(context.device, &semaphoreInfo, nullptr, &imageAvailableSemaphore_))
-			|| !VkCheck(vkCreateSemaphore(context.device, &semaphoreInfo, nullptr, &renderFinishedSemaphore_))) {
-			throw std::runtime_error("failed to create semaphores!");
+	void VulkanRenderSystem::CreateSemaphores() {
+		for (auto i = 0; i < NumberOfFrameBuffers; i++) {
+			VkSemaphore imageAvailableSemaphore = VK_NULL_HANDLE;
+			CreateSemaphore(imageAvailableSemaphore);
+			mImageAvailableSemaphores[i] = imageAvailableSemaphore;
+			VkSemaphore renderFinishedSemaphore = VK_NULL_HANDLE;
+			CreateSemaphore(renderFinishedSemaphore);
+			mRenderFinishedSemaphore[i] = renderFinishedSemaphore;
 		}
 	}
 

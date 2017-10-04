@@ -96,8 +96,9 @@ namespace Vulkan {
 		spirv_cross::Compiler comp(move(spirv));
 		spirv_cross::ShaderResources resources = comp.get_shader_resources();
 
-		for (auto &p : resources.stage_inputs) {
-			const auto type = comp.get_type(p.type_id);
+		for (auto &p : resources.uniform_buffers) {
+			shader.bindings.push_back(Uniform);
+			/*const auto type = comp.get_type(p.type_id);
 			switch (type.basetype) {
 			case spirv_cross::SPIRType::Void: break;
 			case spirv_cross::SPIRType::Boolean: break;
@@ -138,10 +139,25 @@ namespace Vulkan {
 			}
 			case spirv_cross::SPIRType::Unknown: break;
 			default:;
+			}*/
+		}
+
+		for (auto &p : resources.sampled_images) {
+			const auto type = comp.get_type(p.type_id);
+			switch (type.basetype) {
+			case spirv_cross::SPIRType::SampledImage:
+			case spirv_cross::SPIRType::Sampler:
+			{
+				shader.bindings.push_back(Sampler);
+				shader.params.push_back(None);
+				break;
+			}
+			default:;
 			}
 		}
 	}
-	static std::vector<uint32_t> ReadSpirv(const char *path) {
+
+	std::vector<uint32_t> ReadSpirv(const char *path) {
 		FILE *file = fopen(path, "rb");
 		if (!file) {
 			fprintf(stderr, "Failed to open SPIRV file: %s\n", path);
@@ -172,7 +188,5 @@ namespace Vulkan {
 		createInfo.pCode = codeAligned.data();
 		const VkResult res = vkCreateShaderModule(context.device, &createInfo, nullptr, &shader.shaderModule);
 		VkCheckOrThrow(res, "failed to create shader module!");
-
-		BuildShaderParams(ReadSpirv(shader.shaderid.GetVertexShader().c_str()), shader);
 	}
 }

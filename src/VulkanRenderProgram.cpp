@@ -86,6 +86,7 @@ namespace Vulkan {
 	}
 
 	static VkPipeline CreatePipeline(uint64_t pipelineState, VertexType vertexType, VkShaderModule vertexShader, VkShaderModule fragmentShader, VkPipelineLayout pipelineLayout) {
+		PrintPipelineState(pipelineState);
 		VertexLayout& vertexLayout = vertexLayouts[vertexType];
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -108,9 +109,9 @@ namespace Vulkan {
 		rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 		rasterizer.depthClampEnable = VK_FALSE;
 		rasterizer.rasterizerDiscardEnable = VK_FALSE;
-		rasterizer.polygonMode = GetPolygonMode(pipelineState); //VK_POLYGON_MODE_FILL;
+		rasterizer.polygonMode = VK_POLYGON_MODE_FILL;// GetPolygonMode(pipelineState); //VK_POLYGON_MODE_FILL;
 		rasterizer.lineWidth = 1.0f;
-		rasterizer.cullMode = GetCullMode(pipelineState); //VK_CULL_MODE_FRONT_BIT
+		rasterizer.cullMode = VK_CULL_MODE_FRONT_BIT;// GetCullMode(pipelineState); //VK_CULL_MODE_FRONT_BIT
 		rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
 		rasterizer.depthBiasEnable = VK_FALSE;
 
@@ -121,15 +122,15 @@ namespace Vulkan {
 
 		VkPipelineDepthStencilStateCreateInfo depthStencil = {};
 		depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-		depthStencil.depthTestEnable = (pipelineState & DepthFunction) == DepthFunctionNoneWriteOff ? VK_TRUE : VK_FALSE; // VK_TRUE;
-		depthStencil.depthWriteEnable = (pipelineState & DepthFunction) == DepthFunctionLessOrEqualWriteOn ? VK_TRUE : VK_FALSE;// VK_TRUE;
+		depthStencil.depthTestEnable = VK_TRUE; //(pipelineState & DepthFunction) == DepthFunctionNoneWriteOff ? VK_TRUE : VK_FALSE; // VK_TRUE;
+		depthStencil.depthWriteEnable = VK_TRUE;// (pipelineState & DepthFunction) == DepthFunctionLessOrEqualWriteOn ? VK_TRUE : VK_FALSE;// VK_TRUE;
 		depthStencil.depthCompareOp = GetDepthCompareOp(pipelineState);// VK_COMPARE_OP_LESS;
 		depthStencil.depthBoundsTestEnable = VK_FALSE;
 		depthStencil.stencilTestEnable = VK_FALSE;
 
 		VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
 		colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-		colorBlendAttachment.blendEnable = GetBlendMode(pipelineState); //VK_FALSE;
+		colorBlendAttachment.blendEnable = VK_FALSE;// GetBlendMode(pipelineState); //VK_FALSE;
 
 		VkPipelineColorBlendStateCreateInfo colorBlending = {};
 		colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -180,9 +181,8 @@ namespace Vulkan {
 
 		VkPipeline pipeline = VK_NULL_HANDLE;
 
-		if (vkCreateGraphicsPipelines(context.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create graphics pipeline!");
-		}
+		VkCheckOrThrow(vkCreateGraphicsPipelines(context.device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline), "failed to create graphics pipeline!");
+		
 		return pipeline;
 	}
 
@@ -272,7 +272,7 @@ namespace Vulkan {
 		const int vertexShaderidx = prog.mVertexShaderIdx;
 		const int fragmentShaderidx = prog.mFragmentShaderIdx;
 
-		const VkPipeline pipeline = prog.GetPipeline(pipelinestate, mShaders[vertexShaderidx].shaderModule, fragmentShaderidx != -1 ? mShaders[prog.mFragmentShaderIdx].shaderModule : VK_NULL_HANDLE);
+		const VkPipeline pipeline = prog.GetPipeline(pipelinestate, mShaders[vertexShaderidx].shaderModule, fragmentShaderidx != -1 ? mShaders[fragmentShaderidx].shaderModule : VK_NULL_HANDLE);
 
 		CreateDescriptorSet(prog);
 
@@ -323,13 +323,14 @@ namespace Vulkan {
 			{
 				VulkanTexture* diffuseTexture = VulkanTexture::GetTexture(prog.mImageIds[imageIndex++]);
 				VkWriteDescriptorSet & write = writes[writeIndex++];
+
 				memset(&write, 0, sizeof(VkWriteDescriptorSet));
 				write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 				write.dstSet = descriptorSet;
 				write.dstBinding = bindingIndex++;
 				write.descriptorCount = 1;
 				write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				//write.pImageInfo = diffuseTexture->GetImageInfo();
+				write.pImageInfo = &diffuseTexture->GetImageInfo();
 
 				break;
 			}
@@ -339,8 +340,8 @@ namespace Vulkan {
 		}
 
 		vkUpdateDescriptorSets(context.device, writeIndex, writes, 0, nullptr);
-		//vkCmdBindDescriptorSets(VulkanRenderSystem::CurrentCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, prog.hPipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
-		//vkCmdBindPipeline(VulkanRenderSystem::CurrentCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+		vkCmdBindDescriptorSets(context.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, prog.hPipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
+		vkCmdBindPipeline(context.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 	}
 
 	void VulkanGpuProgramState::AllocateUniformBlock(const VulkanShader& shader, UniformBuffer& ubo) {
@@ -363,16 +364,17 @@ namespace Vulkan {
 		vert.stage = ShaderVertex;
 		vert.uniformIdx = static_cast<uint32_t>(mShaders.size());
 		VulkanShader::CreateShaderModule(vertShaderCode, vert);
+		BuildShaderParams(ReadSpirv(shaderId.GetVertexShader().c_str()), vert);
 		mShaders.push_back(vert);
-		mUniformData.resize(mUniformData.size() + 1);
+
 		VulkanShader frag;
 		frag.name = shaderId.GetFragmentShader();
 		frag.shaderid = shaderId;
 		frag.uniformIdx = static_cast<uint32_t>(mShaders.size());
 		frag.stage = ShaderFragment;
 		VulkanShader::CreateShaderModule(fragShaderCode, frag);
+		BuildShaderParams(ReadSpirv(shaderId.GetFragmentShader().c_str()), frag);
 		mShaders.push_back(frag);
-		mUniformData.resize(mUniformData.size() + 1);
 	}
 
 	void VulkanGpuProgramState::CreateDescriptorSet(const VulkanRenderProgram& prog) {

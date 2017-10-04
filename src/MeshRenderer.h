@@ -17,6 +17,7 @@ public:
 	MeshRenderer() = default;
 	void SetMaterial(Material* material, uint32_t subMeshIndex);
 	void SetMesh(Mesh* mesh);
+	Mesh* GetMesh() { return pMesh_; }
 private:
 	friend class GameObject;
 	friend class Scene;

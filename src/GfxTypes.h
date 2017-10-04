@@ -130,160 +130,160 @@ struct PipelineStateBuilder {
 inline void PrintPipelineState(const uint64_t pipelineState) {
 	switch (pipelineState & ClearFlags) {
 	case ClearFlagsColor:
-		DebugPrintF("Clear Flags: Color");
+		DebugPrintF("Clear Flags: Color\n");
 		break;
 	case ClearFlagsDepth:
-		DebugPrintF("Clear Flags: Depth");
+		DebugPrintF("Clear Flags: Depth\n");
 		break;
 	case ClearFlagsDontClear:
-		DebugPrintF("Clear Flags: Don't");
+		DebugPrintF("Clear Flags: Don't\n");
 		break;
 	default:
-		DebugPrintF("Clear Flags: NA");
+		DebugPrintF("Clear Flags: NA\n");
 		break;
 	}
 
 	switch (pipelineState & BlendMode) {
 	case BlendModeAlphaBlend:
-		DebugPrintF("Blend Mode: AlphaBlend");
+		DebugPrintF("Blend Mode: AlphaBlend\n");
 		break;
 	case BlendModeAdditive:
-		DebugPrintF("Blend Mode: Additive");
+		DebugPrintF("Blend Mode: Additive\n");
 		break;
 	case BlendModeOff:
-		DebugPrintF("Blend Mode: Off");
+		DebugPrintF("Blend Mode: Off\n");
 		break;
 	default:
-		DebugPrintF("Blend Mode: NA");
+		DebugPrintF("Blend Mode: NA\n");
 		break;
 	}
 
 	switch (pipelineState & DepthFunction) {
 	case DepthFunctionLessOrEqualWriteOff:
-		DebugPrintF("Depth Function: Less Or Equal Write Off");
+		DebugPrintF("Depth Function: Less Or Equal Write Off\n");
 		break;
 	case DepthFunctionLessOrEqualWriteOn:
-		DebugPrintF("Depth Function: Less Or Equal Write On");
+		DebugPrintF("Depth Function: Less Or Equal Write On\n");
 		break;
 	case DepthFunctionNoneWriteOff:
-		DebugPrintF("Depth Function: None Write Off");
+		DebugPrintF("Depth Function: None Write Off\n");
 		break;
 	default:
-		DebugPrintF("Depth Function: NA");
+		DebugPrintF("Depth Function: NA\n");
 		break;
 	}
 
 	switch (pipelineState & TextureWrap) {
 	case TextureWrapRepeat:
-		DebugPrintF("Texture Wrap: Repeat");
+		DebugPrintF("Texture Wrap: Repeat\n");
 		break;
 	case TextureWrapClamp:
-		DebugPrintF("Texture Wrap: Clamp");
+		DebugPrintF("Texture Wrap: Clamp\n");
 		break;
 	default:
-		DebugPrintF("Texture Wrap: NA");
+		DebugPrintF("Texture Wrap: NA\n");
 		break;
 	}
 
 	switch (pipelineState & TextureFilter) {
 	case TextureFilterNearest:
-		DebugPrintF("Texture Filter: Nearest");
+		DebugPrintF("Texture Filter: Nearest\n");
 		break;
 	case TextureFilterLinear:
-		DebugPrintF("Texture Filter: Linear");
+		DebugPrintF("Texture Filter: Linear\n");
 		break;
 	default:
-		DebugPrintF("Texture Filter: NA");
+		DebugPrintF("Texture Filter: NA\n");
 		break;
 	}
 
 	switch (pipelineState & Mipmaps) {
 	case MipmapsGenerate:
-		DebugPrintF("Mipmaps: Generate");
+		DebugPrintF("Mipmaps: Generate\n");
 		break;
 	case MipmapsNone:
-		DebugPrintF("Mipmaps: None");
+		DebugPrintF("Mipmaps: None\n");
 		break;
 	default:
-		DebugPrintF("Mipmaps: NA");
+		DebugPrintF("Mipmaps: NA\n");
 		break;
 	}
 
 	switch (pipelineState & ColorSpace) {
 	case ColorSpaceRGB:
-		DebugPrintF("Color Space: RGB");
+		DebugPrintF("Color Space: RGB\n");
 		break;
 	case ColorSpaceSRGB:
-		DebugPrintF("Color Space: SRGB");
+		DebugPrintF("Color Space: SRGB\n");
 		break;
 	default:
-		DebugPrintF("Color Space: NA");
+		DebugPrintF("Color Space: NA\n");
 		break;
 	}
 
 	switch (pipelineState & Anisotropy) {
 	case Anisotropyk1:
-		DebugPrintF("Anisotropy: 1");
+		DebugPrintF("Anisotropy: 1\n");
 		break;
 	case Anisotropyk2:
-		DebugPrintF("Anisotropy: 2");
+		DebugPrintF("Anisotropy: 2\n");
 		break;
 	case Anisotropyk4:
-		DebugPrintF("Anisotropy: 4");
+		DebugPrintF("Anisotropy: 4\n");
 		break;
 	case Anisotropyk8:
-		DebugPrintF("Anisotropy: 8");
+		DebugPrintF("Anisotropy: 8\n");
 		break;
 	case Anisotropyk16:
-		DebugPrintF("Anisotropy: 16");
+		DebugPrintF("Anisotropy: 16\n");
 		break;
 	default:
-		DebugPrintF("Anisotropy: NA");
+		DebugPrintF("Anisotropy: NA\n");
 		break;
 	}
 
 	switch (pipelineState & CullMode) {
 	case CullModeBack:
-		DebugPrintF("Culling Mode: Back");
+		DebugPrintF("Culling Mode: Back\n");
 		break;
 	case CullModeFront:
-		DebugPrintF("Culling Mode: Front");
+		DebugPrintF("Culling Mode: Front\n");
 		break;
 	case CullModeOff:
-		DebugPrintF("Culling Mode: Off");
+		DebugPrintF("Culling Mode: Off\n");
 		break;
 	default:
-		DebugPrintF("Culling Mode: NA");
+		DebugPrintF("Culling Mode: NA\n");
 		break;
 	}
 
 	switch (pipelineState & FillMode) {
 	case FillModeSolid:
-		DebugPrintF("Fill Mode: Solid");
+		DebugPrintF("Fill Mode: Solid\n");
 		break;
 	case FillModeWireWireframe:
-		DebugPrintF("Fill Mode: Wireframe");
+		DebugPrintF("Fill Mode: Wireframe\n");
 		break;
 	default:
-		DebugPrintF("Fill Mode: NA");
+		DebugPrintF("Fill Mode: NA\n");
 		break;
 	}
 
 	switch (pipelineState & PrimitiveTopology) {
 	case PrimitiveTopologyTriangles:
-		DebugPrintF("Geometry Primitive: Triangles");
+		DebugPrintF("Geometry Primitive: Triangles\n");
 		break;
 	case PrimitiveTopologyLines:
-		DebugPrintF("Geometry Primitive: Lines");
+		DebugPrintF("Geometry Primitive: Lines\n");
 		break;
 	case PrimitiveTopologyPatches:
-		DebugPrintF("Geometry Primitive: Patches");
+		DebugPrintF("Geometry Primitive: Patches\n");
 		break;
 	case PrimitiveTopologyPoints:
-		DebugPrintF("Geometry Primitive: Points");
+		DebugPrintF("Geometry Primitive: Points\n");
 		break;
 	default:
-		DebugPrintF("Geometry Primitive: NA");
+		DebugPrintF("Geometry Primitive: NA\n");
 		break;
 	}
 }

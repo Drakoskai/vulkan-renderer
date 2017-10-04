@@ -26,7 +26,7 @@ public:
 	void Run() {
 		GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Kai Engine", nullptr, nullptr);
 		IRenderer* renderer = new Vulkan::VulkanRenderSystem(window);
-		Scene* scene = new Scene(renderer);
+		
 
 		GameObject* mainCamera = new GameObject();
 		mainCamera->AddComponent<Camera>();
@@ -43,20 +43,30 @@ public:
 		//mesh->LoadFromFile(SPONZA_MODEL_NAME);
 		MeshRenderer* cubeRenderer = model->GetComponent<MeshRenderer>();
 		cubeRenderer->SetMesh(mesh);
-		
+
+		Scene* scene = new Scene(renderer);
 		scene->Add(model);
+
+
+		std::vector<SubMesh>& submeshes = mesh->GetSubMeshes();
+		SubMesh& submesh = submeshes[0];
+		uint64_t materialHash = submesh.material.HashCode();
+
+		if (Material::materials.find(materialHash) == end(Material::materials)) {
+			Material::materials[materialHash] = submesh.material;
+		}
 
 		while(!glfwWindowShouldClose(window)) {
 			glfwPollEvents();	
-			//static auto startTime = std::chrono::high_resolution_clock::now();
-			//auto currentTime = std::chrono::high_resolution_clock::now();
-			//float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
+			static auto startTime = std::chrono::high_resolution_clock::now();
+			auto currentTime = std::chrono::high_resolution_clock::now();
+			float time = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count() / 1000.0f;
 
-			//Transform* modelTransform = model->GetComponent<Transform>();
+			Transform* modelTransform = model->GetComponent<Transform>();
 
-			//modelTransform->SetRotation(rotate(glm::quat(), time * glm::radians(90.0f), Vec3(0.0f, 0.0f, 1.0f)));			
-			//renderer->PrepareFrame();
-			//renderer->PresentFrame();
+			modelTransform->SetRotation(rotate(glm::quat(), time * glm::radians(90.0f), Vec3(0.0f, 0.0f, 1.0f)));			
+			renderer->PrepareFrame();
+			renderer->PresentFrame();
 		}
 
 		SafeDelete(scene);

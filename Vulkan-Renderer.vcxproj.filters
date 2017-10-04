@@ -84,9 +84,6 @@
     <ClCompile Include="src\ObjFileLoader.cpp">
       <Filter>Source Files\Render</Filter>
     </ClCompile>
-    <ClCompile Include="src\VulkanDrawable.cpp">
-      <Filter>Source Files\Render\Vulkan</Filter>
-    </ClCompile>
     <ClCompile Include="src\SubMesh.cpp">
       <Filter>Source Files\Render</Filter>
     </ClCompile>
@@ -184,9 +181,6 @@
     </ClInclude>
     <ClInclude Include="src\SubMesh.h">
       <Filter>Header Files\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VulkanDrawable.h">
-      <Filter>Header Files\Render\Vulkan</Filter>
     </ClInclude>
     <ClInclude Include="src\VulkanTexture.h">
       <Filter>Header Files\Render\Vulkan</Filter>

@@ -52,7 +52,9 @@ namespace Vulkan {
 	class VulkanGpuProgramState {
 	public:
 		VulkanGpuProgramState() : mCounter(0), mCurrent(0), mCurrentBuffer(0), mCurrentDescriptorSet(0),
-			mCurrentUniformBufferOffset(0) {}
+			mCurrentUniformBufferOffset(0) {
+			mUniformData.resize(NumberOfFrameBuffers);
+		}
 
 		~VulkanGpuProgramState();
 		void Init();

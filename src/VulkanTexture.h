@@ -15,7 +15,7 @@ namespace Vulkan {
 		void Generate();
 		VkImageView GetImageView() const;
 		VkSampler GetSampler() const;
-		VkDescriptorImageInfo GetImageInfo() const;
+		const VkDescriptorImageInfo& GetImageInfo() const;
 	private:
 		void CreateTextureImage();
 		void CreateTextureImageView();

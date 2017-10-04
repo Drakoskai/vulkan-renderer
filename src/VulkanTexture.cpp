@@ -33,7 +33,7 @@ namespace Vulkan {
 		return hTextureSampler;
 	}
 
-	VkDescriptorImageInfo VulkanTexture::GetImageInfo() const {
+	const VkDescriptorImageInfo& VulkanTexture::GetImageInfo() const {
 		return mImageInfo;
 	}
 

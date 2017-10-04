@@ -54,6 +54,7 @@ namespace Vulkan {
 		int GetInputStageSizeBytes() const;
 		static void CreateShaderModule(const std::vector<char>& code, VulkanShader& shader);
 	};
-
+	void BuildShaderParams(const std::vector<uint32_t>& spirv, VulkanShader& shader);
+	std::vector<uint32_t> ReadSpirv(const char *path);
 }
 #endif

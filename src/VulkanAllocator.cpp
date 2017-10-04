@@ -61,6 +61,10 @@ namespace Vulkan {
 	}
 
 	void VulkanAllocator::EmptyGarbage() {
+		if (mGarbage.size() == 0) {
+			return;
+		}
+
 		mGarbageIndex = (mGarbageIndex + 1) % NumberOfFrameBuffers;
 		std::vector<VulkanAllocation> & g = mGarbage[mGarbageIndex];
 		const auto numAllocations = mGarbage.size();

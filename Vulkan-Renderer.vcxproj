@@ -178,7 +178,6 @@
     <ClCompile Include="src\VulkanAllocator.cpp" />
     <ClCompile Include="src\VulkanBuffer.cpp" />
     <ClCompile Include="src\VulkanBufferStaging.cpp" />
-    <ClCompile Include="src\VulkanDrawable.cpp" />
     <ClCompile Include="src\VulkanInit.cpp" />
     <ClCompile Include="src\VulkanMemoryBlock.cpp" />
     <ClCompile Include="src\VulkanRenderProgram.cpp" />
@@ -212,7 +211,6 @@
     <ClInclude Include="src\VulkanAllocator.h" />
     <ClInclude Include="src\VulkanBuffer.h" />
     <ClInclude Include="src\VulkanBufferStaging.h" />
-    <ClInclude Include="src\VulkanDrawable.h" />
     <ClInclude Include="src\VulkanInit.h" />
     <ClInclude Include="src\VulkanMemoryBlock.h" />
     <ClInclude Include="src\VulkanRenderProgram.h" />

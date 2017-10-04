@@ -2,8 +2,9 @@
 #define VULKAN_INIT_H_
 
 #include "stdafx.h"
-#include <vulkan/vulkan.h>
 #include <vector>
+#include <array>
+#include "VulkanBufferStaging.h"
 
 namespace Vulkan {
 
@@ -20,7 +21,9 @@ namespace Vulkan {
 	};
 
 	struct VulkanContext {
-		GpuInfo * gpu;
+		uint64_t counter;
+		uint32_t currentFrame;
+		GpuInfo* gpu;
 		std::vector<GpuInfo> gpus;
 
 		VkDevice device;
@@ -32,7 +35,9 @@ namespace Vulkan {
 		VkCommandPool commandPool;
 		VkPipelineCache pipelineCache;
 		VkRenderPass renderPass;
-		std::vector<VkCommandBuffer> commandBuffers;
+		VkCommandBuffer commandBuffer;
+		std::array<VkCommandBuffer, NumberOfFrameBuffers> commandBuffers;
+		std::array<VkFence, NumberOfFrameBuffers> commandBufferFences;
 	};
 
 	extern VulkanContext context;
